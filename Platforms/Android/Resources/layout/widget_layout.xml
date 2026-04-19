@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
+    android:background="@drawable/widget_background">
+
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+		<TextClock
+			android:id="@+id/widget_current_time_big"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:format12Hour="hh:mm"
+			android:format24Hour="HH:mm"
+			android:textSize="52sp"
+			android:textColor="#FFFFFF"
+			android:includeFontPadding="false" />
+
+		<LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="4dp">
+
+			<TextView
+                android:id="@+id/widget_current_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#EEEEEE"
+                android:includeFontPadding="false" />
+
+			<TextView
+                android:id="@+id/widget_current_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#EEEEEE"
+                android:includeFontPadding="false" />
+		</LinearLayout>
+	</LinearLayout>
+
+	<TextView
+        android:id="@+id/widget_motto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#EEEEEE"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="下一节课：" />
+
+	<TextView
+        android:id="@+id/widget_course_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:includeFontPadding="false" />
+
+	<TextView
+        android:id="@+id/widget_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#EEEEEE"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"
+        android:includeFontPadding="false" />
+</LinearLayout>

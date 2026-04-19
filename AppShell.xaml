@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Schedule2._0.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Schedule2._0"
+    xmlns:views="clr-namespace:Schedule2._0.Views"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="课表助手 2.0">
+
+    <Shell.Behaviors>
+        <toolkit:StatusBarBehavior />
+    </Shell.Behaviors>
+
+    <ShellContent
+        Title="主页"
+        ContentTemplate="{DataTemplate views:MainPage}"
+        Route="MainPage" />
+
+</Shell>

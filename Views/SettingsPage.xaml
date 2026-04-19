@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:Schedule2._0.Views"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="Schedule2._0.Views.SettingsPage"
+             Title="设置"
+             Shell.NavBarIsVisible="False"
+             Shell.BackgroundColor="{DynamicResource AppBg}"
+             BackgroundColor="{DynamicResource AppBg}">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior
+            StatusBarColor="{DynamicResource AppBg}"
+            StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}" />
+    </ContentPage.Behaviors>
+
+    <Grid BackgroundColor="{DynamicResource AppBg}" IsClippedToBounds="False">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,20,16,32" Spacing="22">
+                <HorizontalStackLayout Spacing="8">
+                    <ImageButton HeightRequest="32"
+                                 WidthRequest="32"
+                                 Padding="0"
+                                 BackgroundColor="Transparent"
+                                 Clicked="OnBackButtonClicked"
+                                 VerticalOptions="Center">
+                        <ImageButton.Source>
+                            <FontImageSource FontFamily="MaterialSymbols"
+                                             Glyph="&#xe5c4;"
+                                             Color="{DynamicResource TextMain}"
+                                             Size="28" />
+                        </ImageButton.Source>
+                    </ImageButton>
+                    <Label Text="设置"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextMain}"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <Border BackgroundColor="{DynamicResource CardBg}"
+                        Padding="16"
+                        StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="2,2"
+                                Radius="10"
+                                Opacity="0.3" />
+                    </Border.Shadow>
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="14">
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="当前主题:"
+                                   FontSize="17"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CurrentThemeName}"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextMain}" />
+                        </HorizontalStackLayout>
+
+                        <Grid ColumnDefinitions="*" Margin="0,2,0,4">
+                            <Border StrokeThickness="0"
+                                    HeightRequest="74"
+                                    WidthRequest="300">
+                                <!-- 
+                                    ⬆️ 按钮尺寸配置：
+                                    - HeightRequest = 74px  (按钮高度)
+                                    - WidthRequest  = 300px (按钮宽度)
+                                -->
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18" />
+                                </Border.StrokeShape>
+                                <Grid IsClippedToBounds="True">
+                                    <!-- 完整的浅色背景 -->
+                                    <BoxView>
+                                        <BoxView.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#F1EFF6" Offset="0.0" />
+                                                <GradientStop Color="#E8E5F1" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </BoxView.Background>
+                                    </BoxView>
+
+                                    <!-- 右侧深色斜切区域 -->
+                                    <BoxView HorizontalOptions="Fill">
+                                        <BoxView.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#1A1A1A" Offset="0.0" />
+                                                <GradientStop Color="#262525" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </BoxView.Background>
+                                        <BoxView.Clip>
+                                            <PathGeometry>
+                                                <!-- 
+                                                    ══════════════════════════════════════════════════════════════
+                                                    🎨 撞色分界线参数配置表 (50/50 对称分割)
+                                                    ══════════════════════════════════════════════════════════════
+
+                                                    📐 基础尺寸：
+                                                    ├─ 按钮高度 (Height)          : 74px  ← HeightRequest 定义
+                                                    ├─ 按钮宽度 (Width)           : 300px ← WidthRequest 定义
+                                                    ├─ 中心点水平位置 (Center X)   : 150px (300 ÷ 2)
+                                                    ├─ 中心点垂直位置 (Center Y)   : 37px  (74 ÷ 2)
+                                                    └─ 目标面积比                  : 浅色 50% : 深色 50%
+
+                                                    🔺 倾斜参数：
+                                                    ├─ 倾斜角度 (Angle)           : 约 15-18° (接近垂直)
+                                                    ├─ 计算公式                    : tan(angle) ≈ offset / (height/2)
+                                                    ├─ 理论偏移                    : 37 × tan(15°) ≈ 10px
+                                                    └─ 实际总偏移量 (Total Offset) : 50px ⬅️ 调整此值改变倾斜度
+
+                                                    📍 关键点坐标（当前配置）：
+                                                    ├─ 顶部点 (Top Point)         : (200, 0)  = (150 + 50, 0)
+                                                    │                                  ⬆️     ⬆️    ⬆️
+                                                    │                               顶部X   中心X  偏移量
+                                                    ├─ 底部点 (Bottom Point)      : (100, 74) = (150 - 50, 74)
+                                                    │                                  ⬆️     ⬆️    ⬆️    ⬆️
+                                                    │                               底部X   中心X  偏移量 高度
+                                                    └─ 斜线中点                    : (150, 37) ✓ 位于按钮正中央
+
+                                                    🎨 路径绘制顺序（逆时针）：
+                                                    1. StartPoint="200,0"     → 从顶部右侧开始 (中心150 + 偏移50)
+                                                    2. LineSegment="800,0"    → 延伸到右上角 (覆盖整个宽度)
+                                                    3. LineSegment="800,74"   → 下降到右下角 (按钮高度74)
+                                                    4. LineSegment="100,74"   → 返回底部左侧 (中心150 - 偏移50)
+
+                                                    💡 快速调整指南：
+                                                    ┌────────────────────────────────────────────────────────┐
+                                                    │ 需求                 │ 修改参数                        │
+                                                    ├────────────────────────────────────────────────────────┤
+                                                    │ 增大倾斜角度         │ 增加偏移量 (50→70→100)          │
+                                                    │ 减小倾斜角度(更垂直) │ 减少偏移量 (50→30→20)           │
+                                                    │ 左移分界线(黑色↑)   │ 减小中心点 (150→130→110)        │
+                                                    │ 右移分界线(黑色↓)   │ 增加中心点 (150→170→190)        │
+                                                    │ 改变按钮尺寸         │ 修改 HeightRequest/WidthRequest │
+                                                    └────────────────────────────────────────────────────────┘
+
+                                                    📝 计算公式（供参考）：
+                                                    - 顶部点 X = 中心点 X + 总偏移量
+                                                    - 底部点 X = 中心点 X - 总偏移量
+                                                    - 中心点 X = 按钮宽度 ÷ 2
+                                                    - 中心点 Y = 按钮高度 ÷ 2
+                                                    ══════════════════════════════════════════════════════════════
+                                                -->
+                                                <PathFigure StartPoint="170,0">
+                                                    <!-- ⬆️ 顶部点：170 = 中心150 + 偏移20 -->
+                                                    <LineSegment Point="800,0" />
+                                                    <LineSegment Point="800,74" />
+                                                    <!-- ⬇️ 按钮高度：74 -->
+                                                    <LineSegment Point="130,74" />
+                                                    <!-- ⬆️ 底部点：130 = 中心150 - 偏移20 -->
+                                                </PathFigure>
+                                            </PathGeometry>
+                                        </BoxView.Clip>
+                                    </BoxView>
+
+                                    <!-- 文字布局 -->
+                                    <Grid ColumnDefinitions="*,*" Padding="20,0">
+                                        <!-- 左侧"跟随"文字 - 浅色背景 -->
+                                        <Label Grid.Column="0"
+                                               Text="跟随"
+                                               FontSize="26"
+                                               FontAttributes="Bold"
+                                               TextColor="#2C2C2C"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center">
+                                            <Label.Shadow>
+                                                <Shadow Brush="#E9ECEF"
+                                                        Offset="0,2"
+                                                        Radius="3"
+                                                        Opacity="0.4" />
+                                            </Label.Shadow>
+                                        </Label>
+
+                                        <!-- 右侧"系统"文字 - 深色背景 -->
+                                        <Label Grid.Column="1"
+                                               Text="系统"
+                                               FontSize="26"
+                                               FontAttributes="Bold"
+                                               TextColor="#E9ECEF"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center">
+                                            <Label.Shadow>
+                                                <Shadow Brush="#2C2C2C"
+                                                        Offset="0,3"
+                                                        Radius="6"
+                                                        Opacity="0.7" />
+                                            </Label.Shadow>
+                                        </Label>
+                                    </Grid>
+
+                                    <!-- 透明按钮覆盖整个区域 -->
+                                    <Button BackgroundColor="Transparent"
+                                            Clicked="OnSystemThemeClicked" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
+                            <Button Grid.Row="0"
+                                    Grid.Column="0"
+                                    Text="深色模式"
+                                    Clicked="OnThemeButtonClicked"
+                                    CommandParameter="DarkTheme"
+                                    BackgroundColor="#262525"
+                                    TextColor="White"
+                                    HeightRequest="50"
+                                    FontAttributes="Bold"
+                                    Shadow="{x:Null}" />
+                            <Button Grid.Row="0"
+                                    Grid.Column="1"
+                                    Text="浅色模式"
+                                    Clicked="OnThemeButtonClicked"
+                                    CommandParameter="LightTheme"
+                                    BackgroundColor="#F1EFF6"
+                                    TextColor="#222222"
+                                    HeightRequest="50"
+                                    FontAttributes="Bold"
+                                    Shadow="{x:Null}" />
+                            <Button Grid.Row="1"
+                                    Grid.Column="0"
+                                    Text="猛男粉"
+                                    Clicked="OnThemeButtonClicked"
+                                    CommandParameter="PinkTheme"
+                                    BackgroundColor="#FFD1E0"
+                                    TextColor="#8B2A64"
+                                    HeightRequest="50"
+                                    FontAttributes="Bold"
+                                    Shadow="{x:Null}" />
+                            <Button Grid.Row="1"
+                                    Grid.Column="1"
+                                    Text="流萤青"
+                                    Clicked="OnThemeButtonClicked"
+                                    CommandParameter="FireflyTheme"
+                                    BackgroundColor="#CDEEE7"
+                                    TextColor="#4B3D6B"
+                                    HeightRequest="50"
+                                    FontAttributes="Bold"
+                                    Shadow="{x:Null}" />
+                            <Button Grid.Row="2"
+                                    Grid.Column="0"
+                                    Text="爱上雷神! (慎用!)"
+                                    Clicked="OnThemeButtonClicked"
+                                    CommandParameter="WhiteEreCringeTheme"
+                                    BackgroundColor="#8A2BE2"
+                                    TextColor="#FFD700"
+                                    HeightRequest="50"
+                                    FontAttributes="Bold"
+                                    Shadow="{x:Null}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="关于"
+                           Margin="4,0,0,0"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSec}" />
+
+                    <Border BackgroundColor="{DynamicResource CardBg}"
+                            Padding="16"
+                            StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="2,2"
+                                    Radius="10"
+                                    Opacity="0.3" />
+                        </Border.Shadow>
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAboutButtonClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <Label Text="📅"
+                                   FontSize="20"
+                                   VerticalOptions="Center" />
+                            <Label Text="关于“课表助手”"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="反馈 or 投稿"
+                           Margin="4,0,0,0"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSec}" />
+
+                    <Border BackgroundColor="{DynamicResource CardBg}"
+                            Padding="16"
+                            StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="2,2"
+                                    Radius="10"
+                                    Opacity="0.3" />
+                        </Border.Shadow>
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnFeedbackButtonClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <Label Text="💬"
+                                   FontSize="20"
+                                   VerticalOptions="Center" />
+                            <Label Text="反馈 or 投稿"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="桌面小组件"
+                           Margin="4,0,0,0"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSec}" />
+
+                    <Border BackgroundColor="{DynamicResource CardBg}"
+                            Padding="16"
+                            StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="2,2"
+                                    Radius="10"
+                                    Opacity="0.3" />
+                        </Border.Shadow>
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnWidgetButtonClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <Label Text="📱"
+                                   FontSize="20"
+                                   VerticalOptions="Center" />
+                            <Label Text="桌面小组件"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="隐私政策"
+                           Margin="4,0,0,0"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSec}" />
+
+                    <Border BackgroundColor="{DynamicResource CardBg}"
+                            Padding="16"
+                            StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="2,2"
+                                    Radius="10"
+                                    Opacity="0.3" />
+                        </Border.Shadow>
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPrivacyPolicyClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <Label Text="🔒"
+                                   FontSize="20"
+                                   VerticalOptions="Center" />
+                            <Label Text="隐私政策"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 弹窗容器：爱上雷神确认对话框 -->
+        <views:MenuView x:Name="isolation" />
+
+        <!-- 弹窗容器：护眼提示对话框 -->
+        <views:MenuView x:Name="EyeProtectionMenu" />
+
+        <!-- 弹窗容器：关于信息对话框 -->
+        <views:MenuView x:Name="AboutMenu" />
+
+        <!-- 弹窗容器：反馈投稿对话框 -->
+        <views:MenuView x:Name="FeedbackMenu" />
+
+        <!-- 弹窗容器：隐私政策对话框 -->
+        <views:MenuView x:Name="PrivacyPolicyMenu" />
+
+        <!-- 弹窗容器：桌面小组件对话框 -->
+        <views:MenuView x:Name="WidgetMenu" />
+    </Grid>
+</ContentPage>

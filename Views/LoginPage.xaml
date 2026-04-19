@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Schedule2._0.Views.LoginPage"
+             Title="同步课表">
+
+    <Grid>
+        <WebView x:Name="ScheduleWebView"
+             Source="https://ac.xmu.edu.my/student/index.php"
+             ZIndex="1" />
+
+        <Button x:Name="ConfirmBtn"
+            Text="同步当前课表"
+            Clicked="OnConfirmClicked"
+            IsVisible="False"
+            BackgroundColor="{DynamicResource BtnBgSec}"
+            TextColor="{DynamicResource TextMain}"
+            HeightRequest="55"
+            Margin="30,0,30,40" 
+            VerticalOptions="End"
+            CornerRadius="10"
+            ZIndex="999" />
+    </Grid>
+</ContentPage>

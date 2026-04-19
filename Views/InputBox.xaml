@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Schedule2._0.Views.InputBox"
+             x:Name="this">
+
+    <VerticalStackLayout Spacing="5" Margin="0,10">
+        <Label Text="{Binding Title, Source={x:Reference this}}" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource TextMain}" />
+        <Border Stroke="{DynamicResource TextSec}" StrokeThickness="1" StrokeShape="Rectangle" Padding="10,0">
+            <Grid HeightRequest="45">
+                <Entry Text="{Binding Text, Source={x:Reference this}, Mode=TwoWay}" 
+                       IsVisible="{Binding IsNormalMode, Source={x:Reference this}}" 
+                       VerticalOptions="Center" 
+                       TextColor="{DynamicResource TextMain}" 
+                       PlaceholderColor="{DynamicResource TextSec}"/>
+
+                <Picker SelectedItem="{Binding Text, Source={x:Reference this}, Mode=TwoWay}" 
+                        ItemsSource="{Binding ItemsSource, Source={x:Reference this}}" 
+                        IsVisible="{Binding IsPickerMode, Source={x:Reference this}}" 
+                        VerticalOptions="Center" 
+                        TextColor="{DynamicResource TextMain}" 
+                        TitleColor="{DynamicResource TextSec}"/>
+
+                <HorizontalStackLayout Spacing="5" VerticalOptions="Center" 
+                       IsVisible="{Binding IsTimeMode, Source={x:Reference this}}">
+
+                    <Button x:Name="AmBtn" Text="am" Clicked="SetAm" HeightRequest="32" WidthRequest="40" Padding="0" />
+                    <Button x:Name="PmBtn" Text="pm" Clicked="SetPm" HeightRequest="32" WidthRequest="40" Padding="0" />
+
+                    <Entry Text="{Binding HourPart, Source={x:Reference this}}" 
+                           Placeholder="08" 
+                           TextColor="{DynamicResource TextMain}"
+                           Keyboard="Numeric" 
+                           WidthRequest="35" 
+                           HorizontalTextAlignment="Center" 
+                           TextChanged="OnTimeChanged" />
+                    <Label Text="时" VerticalOptions="Center" TextColor="{DynamicResource TextMain}" />
+
+                    <Entry Text="{Binding MinutePart, Source={x:Reference this}}" 
+                           Placeholder="00" 
+                           TextColor="{DynamicResource TextMain}"
+                           Keyboard="Numeric" 
+                           WidthRequest="35" 
+                           HorizontalTextAlignment="Center" 
+                           TextChanged="OnTimeChanged" />
+                    <Label Text="分" VerticalOptions="Center" TextColor="{DynamicResource TextMain}" />
+
+                </HorizontalStackLayout>
+            </Grid>
+        </Border>
+    </VerticalStackLayout>
+</ContentView>

@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Color x:Key="White">#FFFFFF</Color>
+    <Color x:Key="Black">#000000</Color>
+    <Color x:Key="Gray200">#C8C8C8</Color>
+    <Color x:Key="Gray500">#6E6E6E</Color>
+    <Color x:Key="Gray900">#212121</Color>
+
+    <!-- 默认颜色（App 启动时生效，ThemeService 运行后被覆盖） -->
+    <Color x:Key="AppBg">#F8F9FA</Color>
+    <Color x:Key="NavText">#212529</Color>
+    <Color x:Key="CardBg">#FFFFFF</Color>
+    <Color x:Key="BtnBgMain">#4A90E2</Color>
+    <Color x:Key="BtnBgSec">#E9ECEF</Color>
+    <Color x:Key="TextMain">#1A1A1A</Color>
+    <Color x:Key="TextSec">#6C757D</Color>
+    <Color x:Key="TextAccent">#007BFF</Color>
+
+    <ResourceDictionary x:Key="DarkTheme">
+        <Color x:Key="AppBg">#121212</Color>
+        <Color x:Key="NavText">#FFFFFF</Color>
+        <Color x:Key="CardBg">#1E1E1E</Color>
+        <Color x:Key="BtnBgMain">#002FA7</Color>
+        <Color x:Key="BtnBgSec">#2C2C2C</Color>
+        <Color x:Key="TextMain">#FFFFFF</Color>
+        <Color x:Key="TextSec">#888888</Color>
+        <Color x:Key="TextAccent">#007BFF</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="LightTheme">
+        <Color x:Key="AppBg">#F8F9FA</Color>
+        <Color x:Key="NavText">#212529</Color>
+        <Color x:Key="CardBg">#FFFFFF</Color>
+        <Color x:Key="BtnBgMain">#4A90E2</Color>
+        <Color x:Key="BtnBgSec">#E9ECEF</Color>
+        <Color x:Key="TextMain">#1A1A1A</Color>
+        <Color x:Key="TextSec">#6C757D</Color>
+        <Color x:Key="TextAccent">#007BFF</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="PinkTheme">
+        <Color x:Key="AppBg">#FFDDEE</Color>
+        <Color x:Key="NavText">#8B008B</Color>
+        <Color x:Key="CardBg">#FFB6E1</Color>
+        <Color x:Key="BtnBgMain">#FF88BB</Color>
+        <Color x:Key="BtnBgSec">#FFC0CB</Color>
+        <Color x:Key="TextMain">#2C2C2C</Color>
+        <Color x:Key="TextSec">#9370DB</Color>
+        <Color x:Key="TextAccent">#C71585</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="FireflyTheme">
+        <Color x:Key="AppBg">#E6F4F1</Color>
+        <Color x:Key="NavText">#4B3D6B</Color>
+        <Color x:Key="CardBg">#BEEBE4</Color>
+        <Color x:Key="BtnBgMain">#50C8B1</Color>
+        <Color x:Key="BtnBgSec">#C7EDE7</Color>
+        <Color x:Key="TextMain">#2A323F</Color>
+        <Color x:Key="TextSec">#7A869A</Color>
+        <Color x:Key="TextAccent">#008B8B</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="WhiteEreCringeTheme">
+        <Color x:Key="AppBg">#6A0DAD</Color>
+        <Color x:Key="NavText">#FFD700</Color>
+        <Color x:Key="CardBg">#EE9A00</Color>
+        <Color x:Key="BtnBgMain">#FFC107</Color>
+        <Color x:Key="BtnBgSec">#8A2BE2</Color>
+        <Color x:Key="TextMain">#000000</Color>
+        <Color x:Key="TextSec">#A186BE</Color>
+        <Color x:Key="TextAccent">#8A2BE2</Color>
+    </ResourceDictionary>
+    <!--===============================在添加主题后，一定要去以下地方进行修改！===============================-->
+    
+    <!--1. SettingsViewModel.cs里：-->
+    <!--private static readonly Dictionary<int, string>ThemeNames = new() 添加索引（主题名称）-->
+
+    <!--2. SettingsViewModel.cs里：-->
+    <!--private void SwitchTheme(string themeMode) 处理从 XAML 传来的 CommandParameter-->
+
+    <!--3. ThemeService.cs里：-->
+    <!-- targetKey = themeMode switch 添加x:key的名称-->
+
+    <!--4. SettingsPage.xaml里：-->
+    <!--SettingsPage.xaml 前端添加按钮-->
+</ResourceDictionary>

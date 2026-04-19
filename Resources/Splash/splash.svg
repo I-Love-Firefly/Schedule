@@ -1,0 +1,17 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(362, 300) scale(0.6)">
+    <rect x="0" y="0" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+    <rect x="160" y="0" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+    <rect x="320" y="0" width="120" height="120" fill="#A2D2FF"/>
+    <rect x="0" y="160" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+    <rect x="160" y="160" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+    <rect x="320" y="160" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+    <rect x="0" y="320" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+    <rect x="160" y="320" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+    <rect x="320" y="320" width="120" height="120" stroke="white" stroke-width="20" fill="none"/>
+  </g>
+
+  <text x="512" y="700" font-family="Arial, sans-serif" font-size="64" fill="white" text-anchor="middle" font-weight="bold">
+    课表助手
+  </text>
+</svg>

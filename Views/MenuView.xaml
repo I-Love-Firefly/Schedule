@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Schedule2._0.Views.MenuView"
+             x:Name="Root"
+             IsVisible="False"
+             Opacity="1"
+             InputTransparent="True">
+
+    <!-- Full screen container. Overlay blocks interaction but does not close the dialog on tap. -->
+    <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
+        <!-- Overlay: covers whole screen, blocks clicks (InputTransparent=false) but has no tap handler -->
+        <BoxView x:Name="Overlay"
+                 Color="Black"
+                 Opacity="0"
+                 IsVisible="False"
+                 InputTransparent="False"
+                 HorizontalOptions="Fill" VerticalOptions="Fill">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBackgroundTapped" NumberOfTapsRequired="1" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- ContentHost: card container that holds the dialog content. Margin controls placement. -->
+        <Border x:Name="ContentHost"
+                BackgroundColor="Transparent"
+                StrokeThickness="0"
+                Opacity="0"
+                InputTransparent="False"
+                HorizontalOptions="{Binding HorizontalAlign, Source={x:Reference Root}}"
+                VerticalOptions="{Binding VerticalAlign, Source={x:Reference Root}}"
+                Margin="{Binding ContentMargin, Source={x:Reference Root}}">
+            <ContentPresenter />
+        </Border>
+    </Grid>
+</ContentView>
