@@ -25,15 +25,15 @@ namespace Schedule2._0.Services
     /// </remarks>
     public class ParserService
     {
-        private readonly ISchoolAdapter _adapter;
+        private readonly ISchoolAdapterProvider _adapterProvider;
 
         /// <summary>
         /// 构造函数注入: 程序启动时,MauiProgram 会自动把注册好的适配器传进来
         /// </summary>
-        /// <param name="adapter">在 MauiProgram.cs 中注册的学校适配器实例</param>
-        public ParserService(ISchoolAdapter adapter)
+        /// <param name="adapterProvider">在 MauiProgram.cs 中注册的学校适配器提供者实例</param>
+        public ParserService(ISchoolAdapterProvider adapterProvider)
         {
-            _adapter = adapter;
+            _adapterProvider = adapterProvider;
         }
 
         /// <summary>
@@ -43,7 +43,13 @@ namespace Schedule2._0.Services
         /// <remarks>
         /// 此脚本会在课表页面加载完成后执行,从HTML中提取课程数据
         /// </remarks>
-        public string GetExtractScript() => _adapter.GetExtractScript();
+        public string GetExtractScript() => GetExtractScript(SchoolCodes.Xmum);
+
+        public string GetExtractScript(string? schoolCode)
+        {
+            return _adapterProvider.GetBySchoolCode(schoolCode).GetExtractScript();
+        }
+
 
         /// <summary>
         /// 解析从JavaScript脚本提取的原始数据字符串
@@ -53,6 +59,11 @@ namespace Schedule2._0.Services
         /// <remarks>
         /// 将格式化的字符串数据转换为 Course 对象列表
         /// </remarks>
-        public List<Course> ParseRawString(string rawData) => _adapter.ParseRawString(rawData);
+        public List<Course> ParseRawString(string rawData) => ParseRawString(SchoolCodes.Xmum, rawData);
+
+        public List<Course> ParseRawString(string? schoolCode, string rawData)
+        {
+            return _adapterProvider.GetBySchoolCode(schoolCode).ParseRawString(rawData);
+        }
     }
 }

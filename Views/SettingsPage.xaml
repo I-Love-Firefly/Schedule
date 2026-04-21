@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:Schedule2._0.Views"
@@ -38,6 +38,11 @@
                            TextColor="{DynamicResource TextMain}"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
+                <Label Text="主题"
+                        Margin="4,0,0,0"
+                        FontSize="15"
+                        FontAttributes="Bold"
+                        TextColor="{DynamicResource TextSec}" />
 
                 <Border BackgroundColor="{DynamicResource CardBg}"
                         Padding="16"
@@ -52,15 +57,43 @@
                         <RoundRectangle CornerRadius="20" />
                     </Border.StrokeShape>
                     <VerticalStackLayout Spacing="14">
-                        <HorizontalStackLayout Spacing="8">
-                            <Label Text="当前主题:"
-                                   FontSize="17"
-                                   FontAttributes="Bold" />
-                            <Label Text="{Binding CurrentThemeName}"
-                                   FontSize="17"
-                                   FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextMain}" />
-                        </HorizontalStackLayout>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                <Label Text="当前主题:"
+                                       FontSize="17"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource TextMain}" />
+                                <Label Text="{Binding CurrentThemeName}"
+                                       FontSize="17"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource TextMain}" />
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                <Label x:Name="LuxLabel"
+                                       FontSize="13"
+                                       TextColor="{DynamicResource TextSec}"
+                                       VerticalOptions="Center" />
+                                <Border BackgroundColor="Transparent"
+                                        Stroke="#2196F3"
+                                        WidthRequest="15"
+                                        HeightRequest="15"
+                                        StrokeThickness="1.5"
+                                        VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8" />
+                                    </Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnLuxInfoClicked" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="?"
+                                           FontSize="9"
+                                           FontAttributes="Bold"
+                                           TextColor="#2196F3"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center" />
+                                </Border>
+                            </HorizontalStackLayout>
+                        </Grid>
 
                         <Grid ColumnDefinitions="*" Margin="0,2,0,4">
                             <Border StrokeThickness="0"
@@ -118,7 +151,7 @@
                                                     │                                  ⬆️     ⬆️    ⬆️
                                                     │                               顶部X   中心X  偏移量
                                                     ├─ 底部点 (Bottom Point)      : (100, 74) = (150 - 50, 74)
-                                                    │                                  ⬆️     ⬆️    ⬆️    ⬆️
+                                                    │                                  ⬇️     ⬆️    ⬆️    ⬆️
                                                     │                               底部X   中心X  偏移量 高度
                                                     └─ 斜线中点                    : (150, 37) ✓ 位于按钮正中央
 
@@ -134,7 +167,7 @@
                                                     ├────────────────────────────────────────────────────────┤
                                                     │ 增大倾斜角度         │ 增加偏移量 (50→70→100)          │
                                                     │ 减小倾斜角度(更垂直) │ 减少偏移量 (50→30→20)           │
-                                                    │ 左移分界线(黑色↑)   │ 减小中心点 (150→130→110)        │
+                                                    │ 左移分界线(黑色↑)   │ 符合中心点 (150→130→110)        │
                                                     │ 右移分界线(黑色↓)   │ 增加中心点 (150→170→190)        │
                                                     │ 改变按钮尺寸         │ 修改 HeightRequest/WidthRequest │
                                                     └────────────────────────────────────────────────────────┘
@@ -285,6 +318,7 @@
                             <Label Text="关于“课表助手”"
                                    FontSize="17"
                                    FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextMain}"
                                    VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
@@ -320,6 +354,7 @@
                             <Label Text="反馈 or 投稿"
                                    FontSize="17"
                                    FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextMain}"
                                    VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
@@ -355,6 +390,78 @@
                             <Label Text="桌面小组件"
                                    FontSize="17"
                                    FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextMain}"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- 其他设置（仅VIP显示） -->
+                <VerticalStackLayout x:Name="OtherSettingsSection" Spacing="12" IsVisible="False">
+                    <Label Text="其他设置"
+                           Margin="4,0,0,0"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSec}" />
+
+                    <Border BackgroundColor="{DynamicResource CardBg}"
+                            Padding="16"
+                            StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="2,2"
+                                    Radius="10"
+                                    Opacity="0.3" />
+                        </Border.Shadow>
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOtherSettingsClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <Label Text="⚙️"
+                                   FontSize="20"
+                                   VerticalOptions="Center" />
+                            <Label Text="其他设置"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- 致谢名单板块 -->
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="致谢名单"
+                           Margin="4,0,0,0"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSec}" />
+                    <Border BackgroundColor="{DynamicResource CardBg}"
+                            Padding="16"
+                            StrokeThickness="0">
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="2,2"
+                                    Radius="10"
+                                    Opacity="0.3" />
+                        </Border.Shadow>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAcknowledgmentsClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <Label Text="🌟"
+                                   FontSize="20"
+                                   VerticalOptions="Center" />
+                            <Label Text="致谢名单"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextMain}"
                                    VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
@@ -390,6 +497,7 @@
                             <Label Text="隐私政策"
                                    FontSize="17"
                                    FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextMain}"
                                    VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
@@ -409,10 +517,26 @@
         <!-- 弹窗容器：反馈投稿对话框 -->
         <views:MenuView x:Name="FeedbackMenu" />
 
+        <!-- 弹窗容器：其他设置 -->
+        <views:MenuView x:Name="OtherSettingsMenu" />
+
         <!-- 弹窗容器：隐私政策对话框 -->
         <views:MenuView x:Name="PrivacyPolicyMenu" />
 
         <!-- 弹窗容器：桌面小组件对话框 -->
         <views:MenuView x:Name="WidgetMenu" />
+
+        <!-- 弹窗容器：Lux说明对话框 -->
+        <views:MenuView x:Name="LuxInfoMenu" />
+
+        <!-- 弹窗容器：背景图操作 -->
+        <views:MenuView x:Name="BgActionMenu" />
+
+        <!-- 弹窗容器：背景图裁剪 -->
+        <views:MenuView x:Name="BgCropMenu" />
+
+        <!-- 弹窗容器：卡片不透明度 -->
+        <views:MenuView x:Name="CardOpacityMenu" />
     </Grid>
 </ContentPage>
+

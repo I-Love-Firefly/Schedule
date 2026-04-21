@@ -7,6 +7,11 @@ namespace Schedule2._0.Services
         private const string ThemeTagKey = "user_theme_tag_preference"; // 新增：标签存储键
         private const string LastUpdateKey = "last_sync_time";
         private const string PrivacyAcceptedKey = "privacy_policy_accepted";
+        private const string CardOpacityKey = "card_opacity";
+        private const string BgImagePathKey = "background_image_path";
+        private const string WidgetBgColorKey = "widget_bg_color";
+        private const string WidgetBgOpacityKey = "widget_bg_opacity";
+
 
         /// <summary>
         /// 用户主题设置：0-跟随系统, 1-浅色, 2-深色 ...
@@ -37,12 +42,63 @@ namespace Schedule2._0.Services
         }
 
         /// <summary>
+        /// 课程卡片透明度：0.0（完全透明）到 1.0（完全不透明）
+        /// </summary>
+        public double CardOpacity
+        {
+            get => Preferences.Default.Get(CardOpacityKey, 1.0);
+            set => Preferences.Default.Set(CardOpacityKey, value);
+        }
+
+        /// <summary>
+        /// 用户选择的背景图片路径（空字符串表示无背景图）
+        /// </summary>
+        public string BackgroundImagePath
+        {
+            get => Preferences.Default.Get(BgImagePathKey, string.Empty);
+            set => Preferences.Default.Set(BgImagePathKey, value);
+        }
+
+        /// <summary>
         /// 上次同步课表的时间
         /// </summary>
         public DateTime LastSyncTime
         {
             get => Preferences.Default.Get(LastUpdateKey, DateTime.MinValue);
             set => Preferences.Default.Set(LastUpdateKey, value);
+        }
+
+      
+
+        public Color? WidgetBgColor
+        {
+            get
+            {
+                var hex = Preferences.Default.Get(WidgetBgColorKey, "#FFFFFFFF");
+                return Color.FromArgb(hex);
+            }
+            set
+            {
+                if (value != null)
+                    Preferences.Default.Set(WidgetBgColorKey, value.ToArgbHex());
+            }
+        }
+
+        public double WidgetBgOpacity
+        {
+            get => Preferences.Default.Get(WidgetBgOpacityKey, 1.0);
+            set => Preferences.Default.Set(WidgetBgOpacityKey, value);
+        }
+
+        /// <summary>
+        /// 判断当前用户是否为VIP
+        /// </summary>
+        public bool IsVIP()
+        {
+            // 这里可根据实际业务逻辑判断
+            // 例如：return Preferences.Default.Get("is_vip", false);
+            // 目前默认返回false，可根据需要修改
+            return Preferences.Default.Get("is_vip", false);
         }
     }
 }

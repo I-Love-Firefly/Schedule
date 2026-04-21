@@ -8,7 +8,7 @@ namespace Schedule2._0.Views;
 public partial class LoginPage : ContentPage
 {
     private readonly Services.DatabaseService _db;
-    private readonly Services.ParserService _parser;
+    private readonly ISchoolAdapterProvider _adapterProvider;
 
     // 当前正在使用的适配器（动态决定）
     private ISchoolAdapter _currentAdapter;
@@ -16,11 +16,11 @@ public partial class LoginPage : ContentPage
     // 接收路由参数的属性
     public string SchoolType { get; set; }
 
-    public LoginPage(Services.DatabaseService db, Services.ParserService parser)
+    public LoginPage(Services.DatabaseService db, ISchoolAdapterProvider adapterProvider)
     {
         InitializeComponent();
         _db = db ?? throw new ArgumentNullException(nameof(db));
-        _parser = parser ?? throw new ArgumentNullException(nameof(parser));
+        _adapterProvider = adapterProvider ?? throw new ArgumentNullException(nameof(adapterProvider));
 
         // 绑定导航事件
         ScheduleWebView.Navigated += OnWebViewNavigated;
@@ -33,15 +33,7 @@ public partial class LoginPage : ContentPage
     {
         base.OnNavigatedTo(args);
 
-        // 根据传参决定使用哪套剧本
-        if (SchoolType == "Friend")
-        {
-            _currentAdapter = new FriendSchoolAdapter();
-        }
-        else if (SchoolType == "XMUM")
-        {
-            _currentAdapter = new XmumAdapter();
-        }
+        _currentAdapter = _adapterProvider.GetBySchoolCode(SchoolType);
 
         if (_currentAdapter != null)
         {

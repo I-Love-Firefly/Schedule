@@ -12,6 +12,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:TimeFormatConverter x:Key="TimeFormatConverter" />
+            <converters:ColorOpacityConverter x:Key="ColorOpacityConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -22,6 +23,11 @@
     </ContentPage.Behaviors>
 
     <Grid BackgroundColor="{DynamicResource AppBg}">
+        <Image x:Name="BgImage"
+               Aspect="AspectFill"
+               IsVisible="False"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
         <ScrollView>
             <VerticalStackLayout Padding="18,20,18,28" Spacing="18">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
@@ -111,7 +117,7 @@
                                         </SwipeItems>
                                     </SwipeView.RightItems>
 
-                                    <Border BackgroundColor="{DynamicResource CardBg}"
+                                    <Border BackgroundColor="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=BindingContext.CardOpacity, Converter={StaticResource ColorOpacityConverter}}"
                                             Padding="14,12"
                                             Margin="0"
                                             StrokeThickness="0">
@@ -124,41 +130,44 @@
                                                     Radius="8"
                                                     Opacity="0.12" />
                                         </Border.Shadow>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnCourseCardClicked" />
+                                        </Border.GestureRecognizers>
 
                                         <Grid ColumnDefinitions="76,*" ColumnSpacing="12">
-                                            <VerticalStackLayout Grid.Column="0"
-                                                                 Spacing="2"
-                                                                 VerticalOptions="Center"
-                                                                 HorizontalOptions="Center">
-                                                <Label Text="{Binding StartTime, Converter={StaticResource TimeFormatConverter}}"
-                                                       FontSize="13"
-                                                       FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center" />
-                                                <BoxView HeightRequest="12"
-                                                         WidthRequest="1.5"
-                                                         HorizontalOptions="Center"
-                                                         Color="{DynamicResource TextSec}"
-                                                         Opacity="1" />
-                                                <Label Text="{Binding EndTime, Converter={StaticResource TimeFormatConverter}}"
-                                                       FontSize="13"
-                                                       FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center" />
-                                            </VerticalStackLayout>
+                                                <VerticalStackLayout Grid.Column="0"
+                                                                     Spacing="2"
+                                                                     VerticalOptions="Center"
+                                                                     HorizontalOptions="Center">
+                                                    <Label Text="{Binding StartTime, Converter={StaticResource TimeFormatConverter}}"
+                                                           FontSize="13"
+                                                           FontAttributes="Bold"
+                                                           HorizontalTextAlignment="Center" />
+                                                    <BoxView HeightRequest="12"
+                                                             WidthRequest="1.5"
+                                                             HorizontalOptions="Center"
+                                                             Color="{DynamicResource TextSec}"
+                                                             Opacity="1" />
+                                                    <Label Text="{Binding EndTime, Converter={StaticResource TimeFormatConverter}}"
+                                                           FontSize="13"
+                                                           FontAttributes="Bold"
+                                                           HorizontalTextAlignment="Center" />
+                                                </VerticalStackLayout>
 
-                                            <VerticalStackLayout Grid.Column="1"
-                                                                 Spacing="4"
-                                                                 VerticalOptions="Center">
-                                                <Label Text="{Binding Name}"
-                                                       FontSize="15"
-                                                       FontAttributes="Bold"
-                                                       LineBreakMode="WordWrap"
-                                                       MaxLines="3" />
-                                                <Label Text="{Binding Location}"
-                                                       FontSize="13"
-                                                       TextColor="{DynamicResource TextAccent}" />
-                                            </VerticalStackLayout>
-                                        </Grid>
-                                    </Border>
+                                                <VerticalStackLayout Grid.Column="1"
+                                                                     Spacing="4"
+                                                                     VerticalOptions="Center">
+                                                    <Label Text="{Binding Name}"
+                                                           FontSize="15"
+                                                           FontAttributes="Bold"
+                                                           LineBreakMode="WordWrap"
+                                                           MaxLines="3" />
+                                                    <Label Text="{Binding Location}"
+                                                           FontSize="13"
+                                                           TextColor="{DynamicResource TextAccent}" />
+                                                </VerticalStackLayout>
+                                                </Grid>
+                                            </Border>
                                 </SwipeView>
                             </VerticalStackLayout>
                         </DataTemplate>
@@ -182,7 +191,12 @@
                         IsVisible="False"
                                                  ZIndex="9999" />
 
-                                <views:MenuView x:Name="PrivacyMenu"
+                                <views:MenuView x:Name="CourseDetailMenu"
+                                                                 HorizontalOptions="Fill"
+                                                                 VerticalOptions="Fill"
+                                                                 ZIndex="9997" />
+
+                                                <views:MenuView x:Name="PrivacyMenu"
                                                  HorizontalOptions="Fill"
                                                  VerticalOptions="Fill"
                                                  ZIndex="10000" />

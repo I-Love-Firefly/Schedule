@@ -43,12 +43,31 @@ public partial class MainPage : ContentPage
             await ShowPrivacyPolicyAsync();
         }
 
+        _viewModel.CardOpacity = _configService.CardOpacity;
+
+        LoadBackgroundImage();
+
         await LoadCourses();
+    }
+
+    private void LoadBackgroundImage()
+    {
+        var path = _configService.BackgroundImagePath;
+        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+        {
+            BgImage.Source = ImageSource.FromFile(path);
+            BgImage.IsVisible = true;
+        }
+        else
+        {
+            BgImage.IsVisible = false;
+            BgImage.Source = null;
+        }
     }
 
     protected override bool OnBackButtonPressed()
     {
-        if (HamburgerMenu.IsOpen || ActionMenu.IsOpen)
+        if (HamburgerMenu.IsOpen || ActionMenu.IsOpen || CourseDetailMenu.IsOpen)
         {
             MainThread.BeginInvokeOnMainThread(async () => await CloseAllMenusAsync());
             return true;
@@ -107,6 +126,121 @@ public partial class MainPage : ContentPage
 
         await _dbService.DeleteCourseAsync(course);
         await LoadCourses();
+    }
+
+    private async void OnCourseCardClicked(object sender, EventArgs e)
+    {
+        var element = sender as Element;
+        var course = element?.BindingContext as Course;
+        if (course == null) return;
+
+        if (sender is VisualElement view)
+        {
+            await view.ScaleToAsync(0.98, 60);
+            await view.ScaleToAsync(1.0, 60);
+        }
+
+        await CloseAllMenusAsync();
+
+        var content = new Border
+        {
+            StrokeShape = new RoundRectangle { CornerRadius = 18 },
+            BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
+            Padding = 24,
+            WidthRequest = 300,
+            Content = new VerticalStackLayout
+            {
+                Spacing = 14,
+                Children =
+                {
+                    new Label
+                    {
+                        Text = course.Name,
+                        FontSize = 20,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
+                    },
+                    CreateCourseDetailRow("\ue8b5", "时间", $"{course.StartTime} - {course.EndTime}"),
+                    CreateCourseDetailRow("\ue55f", "地点", string.IsNullOrEmpty(course.Location) ? "未设置" : course.Location),
+                    CreateCourseDetailRow("\ue7fd", "教师", string.IsNullOrEmpty(course.Teacher) ? "未设置" : course.Teacher),
+                    CreateCourseDetailRow("\ue935", "星期", course.DayOfWeek ?? "未设置"),
+                    CreateCourseDetailCloseButton()
+                }
+            }
+        };
+
+        await PopupWindow.ShowCustomAsync(
+            host: CourseDetailMenu,
+            content: content,
+            animationMode: MenuAnimationMode.PopUp,
+            showOverlay: true,
+            horizontalAlign: LayoutOptions.Center,
+            verticalAlign: LayoutOptions.Center,
+            margin: new Thickness(0),
+            overlayOpacity: 0.32
+        );
+    }
+
+    private HorizontalStackLayout CreateCourseDetailRow(string iconGlyph, string label, string value)
+    {
+        return new HorizontalStackLayout
+        {
+            Spacing = 10,
+            Children =
+            {
+                new Label
+                {
+                    Text = iconGlyph,
+                    FontFamily = "MaterialSymbols",
+                    FontSize = 20,
+                    TextColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
+                    VerticalOptions = LayoutOptions.Center
+                },
+                new VerticalStackLayout
+                {
+                    Spacing = 2,
+                    Children =
+                    {
+                        new Label
+                        {
+                            Text = label,
+                            FontSize = 12,
+                            TextColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray
+                        },
+                        new Label
+                        {
+                            Text = value,
+                            FontSize = 15,
+                            FontAttributes = FontAttributes.Bold,
+                            TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    private Button CreateCourseDetailCloseButton()
+    {
+        var button = new Button
+        {
+            Text = "我知道了",
+            FontSize = 15,
+            FontAttributes = FontAttributes.Bold,
+            BackgroundColor = (Color?)Application.Current?.Resources["BtnBgMain"] ?? Colors.LightGray,
+            TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+            CornerRadius = 12,
+            HeightRequest = 44,
+            HorizontalOptions = LayoutOptions.Center,
+            Shadow = null
+        };
+
+        button.Clicked += async (s, e) =>
+        {
+            await CourseDetailMenu.HideAsync();
+        };
+
+        return button;
     }
 
     private async void OnHamburgerClicked(object sender, EventArgs e)
@@ -263,7 +397,7 @@ public partial class MainPage : ContentPage
             bool confirmed = await tcs.Task;
             if (confirmed)
             {
-                await Shell.Current.GoToAsync($"{nameof(LoginPage)}?school=XMUM");
+                await Shell.Current.GoToAsync($"{nameof(LoginPage)}?school={SchoolCodes.Xmum}");
             }
         }
         else if (idx == 1)
@@ -482,5 +616,11 @@ public partial class MainPage : ContentPage
         {
             await HamburgerMenu.HideAsync();
         }
+
+        if (CourseDetailMenu.IsOpen)
+        {
+            await CourseDetailMenu.HideAsync();
+        }
     }
 }
+
