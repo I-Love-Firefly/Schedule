@@ -9,6 +9,9 @@ namespace Schedule2._0.Services
         private const string PrivacyAcceptedKey = "privacy_policy_accepted";
         private const string CardOpacityKey = "card_opacity";
         private const string BgImagePathKey = "background_image_path";
+        private const string BgImageScaleKey = "background_image_scale";
+        private const string BgImageOffsetXKey = "background_image_offset_x";
+        private const string BgImageOffsetYKey = "background_image_offset_y";
         private const string WidgetBgColorKey = "widget_bg_color";
         private const string WidgetBgOpacityKey = "widget_bg_opacity";
 
@@ -57,6 +60,24 @@ namespace Schedule2._0.Services
         {
             get => Preferences.Default.Get(BgImagePathKey, string.Empty);
             set => Preferences.Default.Set(BgImagePathKey, value);
+        }
+
+        public double BackgroundImageScale
+        {
+            get => Preferences.Default.Get(BgImageScaleKey, 1.0);
+            set => Preferences.Default.Set(BgImageScaleKey, value);
+        }
+
+        public double BackgroundImageOffsetX
+        {
+            get => Preferences.Default.Get(BgImageOffsetXKey, 0.0);
+            set => Preferences.Default.Set(BgImageOffsetXKey, value);
+        }
+
+        public double BackgroundImageOffsetY
+        {
+            get => Preferences.Default.Get(BgImageOffsetYKey, 0.0);
+            set => Preferences.Default.Set(BgImageOffsetYKey, value);
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Schedule2._0.Platforms.Android;
 
-[BroadcastReceiver(Label = "XMUM 课表小组件", Exported = true, Name = "site.justindividual.schedule.CourseWidget")]
+[BroadcastReceiver(Label = "课表助手 桌面小组件", Exported = true, Name = "site.justindividual.schedule.CourseWidget")]
 [IntentFilter(new[] { "android.appwidget.action.APPWIDGET_UPDATE", "com.xmu.SCHEDULE_UPDATE_ACTION" })]
 [MetaData("android.appwidget.provider", Resource = "@xml/course_widget_info")]
 public class CourseWidget : AppWidgetProvider

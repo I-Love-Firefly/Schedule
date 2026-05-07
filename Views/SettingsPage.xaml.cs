@@ -1,12 +1,8 @@
-using Schedule2._0.Helpers;
+﻿using Schedule2._0.Helpers;
 using Schedule2._0.Models;
 using Schedule2._0.Services;
 using Schedule2._0.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
-#if ANDROID
-using Microsoft.Maui.Controls;
-using Schedule2._0.Services;
-#endif
 
 namespace Schedule2._0.Views
 {
@@ -47,8 +43,7 @@ namespace Schedule2._0.Views
 
             RefreshBgImageStatusText();
 
-            // 控制“其他设置”板块显示
-            var otherSettingsSection = this.FindByName<Microsoft.Maui.Controls.Layout>("OtherSettingsSection");
+            var otherSettingsSection = this.FindByName<Layout>("OtherSettingsSection");
             if (otherSettingsSection != null)
             {
                 otherSettingsSection.IsVisible = _configService.IsVIP();
@@ -115,10 +110,12 @@ namespace Schedule2._0.Views
             var opacityLabel = new Label
             {
                 Text = $"{(int)(_configService.CardOpacity * 100)}%",
-                FontSize = 16,
+                FontSize = 14,
                 FontAttributes = FontAttributes.Bold,
+                TextColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
                 VerticalOptions = LayoutOptions.Center,
-                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
+                WidthRequest = 45,
+                HorizontalTextAlignment = TextAlignment.End
             };
 
             var opacitySlider = new Slider
@@ -139,7 +136,7 @@ namespace Schedule2._0.Views
                 opacityLabel.Text = $"{(int)(value * 100)}%";
             };
 
-            var opacityRow = new Grid
+            var opacityItem = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitionCollection
                 {
@@ -148,15 +145,22 @@ namespace Schedule2._0.Views
                     new ColumnDefinition(GridLength.Auto)
                 },
                 ColumnSpacing = 10,
-                VerticalOptions = LayoutOptions.Center
+                Children =
+                {
+                    new Label
+                    {
+                        Text = "卡片不透明度",
+                        FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                        VerticalOptions = LayoutOptions.Center
+                    }
+                }
             };
-            var opacityTitle = new Label { Text = "卡片不透明度", FontSize = 15, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center, TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black };
-            Grid.SetColumn(opacityTitle, 0);
             Grid.SetColumn(opacitySlider, 1);
             Grid.SetColumn(opacityLabel, 2);
-            opacityRow.Children.Add(opacityTitle);
-            opacityRow.Children.Add(opacitySlider);
-            opacityRow.Children.Add(opacityLabel);
+            opacityItem.Children.Add(opacitySlider);
+            opacityItem.Children.Add(opacityLabel);
 
             var closeBtn = new Button
             {
@@ -185,13 +189,13 @@ namespace Schedule2._0.Views
                     {
                         new Label
                         {
-                            Text = "其他设置(以后会陆续添加新功能)",
+                            Text = "其他设置",
                             FontSize = 20,
                             FontAttributes = FontAttributes.Bold,
                             TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
                         },
                         bgItem,
-                        opacityRow,
+                        opacityItem,
                         closeBtn
                     }
                 }
@@ -209,112 +213,15 @@ namespace Schedule2._0.Views
             );
         }
 
-        private async Task ShowCardOpacityPopupAsync()
-        {
-            // 课程卡片不透明度（直接可调节）
-            var opacityLabel = new Label
-            {
-                Text = $"{(int)(_configService.CardOpacity * 100)}%",
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalTextAlignment = TextAlignment.End,
-                HorizontalOptions = LayoutOptions.EndAndExpand,
-                WidthRequest = 45
-            };
-
-            var opacitySlider = new Slider
-            {
-                Minimum = 0,
-                Maximum = 1,
-                Value = _configService.CardOpacity,
-                MinimumTrackColor = (Color?)Application.Current?.Resources["TextAccent"] ?? Colors.Blue,
-                MaximumTrackColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
-                ThumbColor = (Color?)Application.Current?.Resources["TextAccent"] ?? Colors.Blue,
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Fill,
-                WidthRequest = 120
-            };
-            opacitySlider.ValueChanged += (s, args) =>
-            {
-                var value = Math.Round(args.NewValue, 2);
-                _configService.CardOpacity = value;
-                opacityLabel.Text = $"{(int)(value * 100)}%";
-            };
-
-            var opacityRow = new Grid
-            {
-                ColumnDefinitions = new ColumnDefinitionCollection
-                {
-                    new ColumnDefinition(GridLength.Auto),
-                    new ColumnDefinition(GridLength.Star),
-                    new ColumnDefinition(GridLength.Auto)
-                },
-                ColumnSpacing = 10,
-                VerticalOptions = LayoutOptions.Center
-            };
-            var opacityTitle = new Label { Text = "卡片不透明度", FontSize = 15, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center, TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black };
-            Grid.SetColumn(opacityTitle, 0);
-            Grid.SetColumn(opacitySlider, 1);
-            Grid.SetColumn(opacityLabel, 2);
-            opacityRow.Children.Add(opacityTitle);
-            opacityRow.Children.Add(opacitySlider);
-            opacityRow.Children.Add(opacityLabel);
-
-            var closeBtn = new Button
-            {
-                Text = "关闭",
-                FontSize = 15,
-                FontAttributes = FontAttributes.Bold,
-                BackgroundColor = (Color?)Application.Current?.Resources["BtnBgMain"] ?? Colors.LightGray,
-                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
-                CornerRadius = 12,
-                HeightRequest = 44,
-                HorizontalOptions = LayoutOptions.Fill,
-                Shadow = null
-            };
-            closeBtn.Clicked += async (s, args) => await CardOpacityMenu.HideAsync();
-
-            var content = new Border
-            {
-                StrokeShape = new RoundRectangle { CornerRadius = 18 },
-                BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
-                Padding = 22,
-                WidthRequest = 320,
-                Content = new VerticalStackLayout
-                {
-                    Spacing = 14,
-                    Children =
-                    {
-                        new Label
-                        {
-                            Text = "卡片不透明度",
-                            FontSize = 20,
-                            FontAttributes = FontAttributes.Bold,
-                            TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
-                        },
-                        opacityRow,
-                        closeBtn
-                    }
-                }
-            };
-
-            await PopupWindow.ShowCustomAsync(
-                host: CardOpacityMenu,
-                content: content,
-                animationMode: MenuAnimationMode.PopUp,
-                showOverlay: true,
-                horizontalAlign: LayoutOptions.Center,
-                verticalAlign: LayoutOptions.Center,
-                margin: new Thickness(0),
-                overlayOpacity: 0.36
-            );
-        }
-
         private async void OnBackButtonClicked(object sender, EventArgs e)
         {
             await Shell.Current.GoToAsync("..");
+        }
+
+        private void OnCardOpacityChanged(object sender, ValueChangedEventArgs e)
+        {
+            var value = Math.Round(e.NewValue, 2);
+            _configService.CardOpacity = value;
         }
 
         private async void OnBackgroundImageClicked(object sender, EventArgs e)
@@ -394,6 +301,9 @@ namespace Schedule2._0.Views
                 {
                     try { File.Delete(_configService.BackgroundImagePath); } catch { }
                     _configService.BackgroundImagePath = string.Empty;
+                    _configService.BackgroundImageScale = 1.0;
+                    _configService.BackgroundImageOffsetX = 0.0;
+                    _configService.BackgroundImageOffsetY = 0.0;
                     RefreshBgImageStatusText();
                     return;
                 }
@@ -434,6 +344,9 @@ namespace Schedule2._0.Views
             }
 
             _configService.BackgroundImagePath = destPath;
+            _configService.BackgroundImageScale = 1.0;
+            _configService.BackgroundImageOffsetX = 0.0;
+            _configService.BackgroundImageOffsetY = 0.0;
             RefreshBgImageStatusText();
 
             await ShowBgCropPopupAsync();
@@ -787,7 +700,7 @@ namespace Schedule2._0.Views
 
             var linkLabel = new Label
             {
-                Text = "点我进行反馈或投稿(该项目前不可用)",
+                Text = "点我进行反馈或投稿(将跳转到外部网页)",
                 FontSize = 15,
                 TextColor = Colors.DodgerBlue,
                 TextDecorations = TextDecorations.Underline,
@@ -798,7 +711,7 @@ namespace Schedule2._0.Views
             linkTap.Tapped += async (s, args) =>
             {
                 await FeedbackMenu.HideAsync();
-                await Launcher.OpenAsync(new Uri("http://42.193.179.91:5000"));
+                await Launcher.OpenAsync(new Uri("https://justindividual.site"));
             };
             linkLabel.GestureRecognizers.Add(linkTap);
 
@@ -864,90 +777,6 @@ namespace Schedule2._0.Views
             };
 
             return button;
-        }
-
-        private async void OnAcknowledgmentsClicked(object sender, EventArgs e)
-        {
-            if (sender is VisualElement view)
-            {
-                await view.ScaleToAsync(0.98, 60);
-                await view.ScaleToAsync(1.0, 60);
-            }
-
-            await CloseDialogsAsync();
-
-            string ackText;
-            try
-            {
-                using var stream = await FileSystem.OpenAppPackageFileAsync("Acknowledgments.txt");
-                using var reader = new StreamReader(stream);
-                ackText = await reader.ReadToEndAsync();
-            }
-            catch
-            {
-                ackText = "无法加载致谢名单。";
-            }
-
-            var scrollView = new ScrollView
-            {
-                MaximumHeightRequest = 420,
-                Content = new Label
-                {
-                    Text = ackText,
-                    FontSize = 13,
-                    LineBreakMode = LineBreakMode.WordWrap,
-                    TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
-                }
-            };
-
-            var closeBtn = new Button
-            {
-                Text = "关闭",
-                FontSize = 15,
-                FontAttributes = FontAttributes.Bold,
-                BackgroundColor = (Color?)Application.Current?.Resources["BtnBgMain"] ?? Colors.LightGray,
-                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
-                CornerRadius = 12,
-                HeightRequest = 44,
-                HorizontalOptions = LayoutOptions.Fill
-            };
-            closeBtn.Clicked += async (s, args) => await AboutMenu.HideAsync();
-
-            var content = new Border
-            {
-                StrokeShape = new RoundRectangle { CornerRadius = 18 },
-                BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
-                Padding = 22,
-                WidthRequest = 320,
-                Content = new VerticalStackLayout
-                {
-                    Spacing = 14,
-                    Children =
-                    {
-                        new Label
-                        {
-                            Text = "致谢名单 ( ゜- ゜)つロ",
-                            FontSize = 20,
-                            FontAttributes = FontAttributes.Bold,
-                            HorizontalOptions = LayoutOptions.Center,
-                            TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
-                        },
-                        scrollView,
-                        closeBtn
-                    }
-                }
-            };
-
-            await PopupWindow.ShowCustomAsync(
-                host: AboutMenu,
-                content: content,
-                animationMode: MenuAnimationMode.PopUp,
-                showOverlay: true,
-                horizontalAlign: LayoutOptions.Center,
-                verticalAlign: LayoutOptions.Center,
-                margin: new Thickness(0),
-                overlayOpacity: 0.36
-            );
         }
 
         private async void OnPrivacyPolicyClicked(object sender, EventArgs e)
@@ -1039,10 +868,156 @@ namespace Schedule2._0.Views
             }
 
             await CloseDialogsAsync();
+
+            var messageLabel = new Label
+            {
+                Text = "该功能可在桌面添加小组件，提醒课程信息（由于安卓系统限制，课程信息可能会延迟数分钟更新）\n\n" +
+                       "由于系统无法自动添加小组件，请按以下步骤手动添加：\n\n" +
+                       "1. 返回手机桌面\n" +
+                       "2. 长按桌面空白处\n" +
+                       "3. 选择\"小组件\"或\"窗口小工具\"\n" +
+                       "4. 找到\"课表助手\"\n" +
+                       "5. 长按并拖动到桌面即可",
+                FontSize = 14,
+                LineBreakMode = LineBreakMode.WordWrap,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                HorizontalOptions = LayoutOptions.Center
+            };
+
+            var okBtn = new Button
+            {
+                Text = "我知道了",
+                WidthRequest = 140,
+                BackgroundColor = (Color?)Application.Current?.Resources["BtnBgMain"] ?? Colors.Blue,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                HorizontalOptions = LayoutOptions.Center
+            };
+            okBtn.Clicked += async (s, args) =>
+            {
+                await WidgetMenu.HideAsync();
+            };
+
+            var content = new Border
+            {
+                StrokeShape = new RoundRectangle { CornerRadius = 18 },
+                BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
+                Padding = 24,
+                WidthRequest = 300,
+                Content = new VerticalStackLayout
+                {
+                    Spacing = 14,
+                    HorizontalOptions = LayoutOptions.Center,
+                    Children =
+                    {
+                        new Label
+                        {
+                            Text = "桌面小组件",
+                            FontSize = 21,
+                            FontAttributes = FontAttributes.Bold,
+                            TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                            HorizontalOptions = LayoutOptions.Center
+                        },
+                        messageLabel,
+                        PopupWindow.CreateSeparator(),
+                        okBtn
+                    }
+                }
+            };
+
+            await PopupWindow.ShowCustomAsync(
+                host: WidgetMenu,
+                content: content,
+                animationMode: MenuAnimationMode.PopUp,
+                showOverlay: true,
+                horizontalAlign: LayoutOptions.Center,
+                verticalAlign: LayoutOptions.Center,
+                margin: new Thickness(0),
+                overlayOpacity: 0.32
+            );
         }
 
-        // 修正签名，支持 TapGestureRecognizer
-        private async void OnLuxInfoClicked(object sender, TappedEventArgs e)
+        private async void OnAcknowledgmentsClicked(object sender, EventArgs e)
+        {
+            if (sender is VisualElement view)
+            {
+                await view.ScaleToAsync(0.98, 60);
+                await view.ScaleToAsync(1.0, 60);
+            }
+
+            await CloseDialogsAsync();
+
+            string acknowledgmentsText;
+            using (var stream = await FileSystem.OpenAppPackageFileAsync("Acknowledgments.txt"))
+            using (var reader = new StreamReader(stream))
+            {
+                acknowledgmentsText = await reader.ReadToEndAsync();
+            }
+
+            var scrollView = new ScrollView
+            {
+                MaximumHeightRequest = 420,
+                Content = new Label
+                {
+                    Text = acknowledgmentsText,
+                    FontSize = 13,
+                    LineBreakMode = LineBreakMode.WordWrap,
+                    TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
+                }
+            };
+
+            var closeBtn = new Button
+            {
+                Text = "关闭",
+                WidthRequest = 120,
+                BackgroundColor = (Color?)Application.Current?.Resources["BtnBgMain"] ?? Colors.Blue,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                HorizontalOptions = LayoutOptions.Center
+            };
+            closeBtn.Clicked += async (s, args) =>
+            {
+                await AboutMenu.HideAsync();
+            };
+
+            var content = new Border
+            {
+                StrokeShape = new RoundRectangle { CornerRadius = 18 },
+                BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
+                Padding = 24,
+                WidthRequest = 340,
+                Content = new VerticalStackLayout
+                {
+                    Spacing = 14,
+                    Children =
+                    {
+                        new Label
+                        {
+                            Text = "致谢名单",
+                            FontSize = 21,
+                            FontAttributes = FontAttributes.Bold,
+                            TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                            HorizontalOptions = LayoutOptions.Center
+                        },
+                        scrollView,
+                        PopupWindow.CreateSeparator(),
+                        closeBtn
+                    }
+                }
+            };
+
+            await PopupWindow.ShowCustomAsync(
+                host: AboutMenu,
+                content: content,
+                animationMode: MenuAnimationMode.PopUp,
+                showOverlay: true,
+                horizontalAlign: LayoutOptions.Center,
+                verticalAlign: LayoutOptions.Center,
+                margin: new Thickness(0),
+                overlayOpacity: 0.32
+            );
+        }
+
+
+        private async void OnLuxInfoClicked(object sender, EventArgs e)
         {
             await CloseDialogsAsync();
 
@@ -1112,33 +1087,405 @@ namespace Schedule2._0.Views
             );
         }
 
-        // 恢复标准实现：关闭所有弹窗
         private async Task CloseDialogsAsync()
         {
             if (AboutMenu.IsOpen)
+            {
                 await AboutMenu.HideAsync();
+            }
+
             if (isolation.IsOpen)
+            {
                 await isolation.HideAsync();
+            }
+
             if (EyeProtectionMenu.IsOpen)
+            {
                 await EyeProtectionMenu.HideAsync();
+            }
+
             if (FeedbackMenu.IsOpen)
+            {
                 await FeedbackMenu.HideAsync();
+            }
+
             if (PrivacyPolicyMenu.IsOpen)
+            {
                 await PrivacyPolicyMenu.HideAsync();
+            }
+
             if (WidgetMenu.IsOpen)
+            {
                 await WidgetMenu.HideAsync();
+            }
+
             if (LuxInfoMenu.IsOpen)
+            {
                 await LuxInfoMenu.HideAsync();
+            }
+
             if (BgCropMenu.IsOpen)
+            {
                 await BgCropMenu.HideAsync();
+            }
+
             if (OtherSettingsMenu.IsOpen)
+            {
                 await OtherSettingsMenu.HideAsync();
+            }
         }
 
         private async Task ShowBgCropPopupAsync()
         {
-            // TODO: 实现背景裁剪弹窗逻辑
-            await Task.CompletedTask;
+            await CloseDialogsAsync();
+
+            var imagePath = _configService.BackgroundImagePath;
+            if (string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath))
+                return;
+
+            var displayInfo = DeviceDisplay.MainDisplayInfo;
+            var density = displayInfo.Density <= 0 ? 1.0 : displayInfo.Density;
+            double screenWidth = displayInfo.Width / density;
+            double screenHeight = displayInfo.Height / density;
+            double screenAspect = screenWidth / screenHeight;
+
+            double popupWidth = Math.Min(screenWidth - 32, 360);
+            double popupHeight = Math.Min(screenHeight - 40, 620);
+            double cropBoxW = popupWidth - 36;
+            double cropBoxH = cropBoxW / screenAspect;
+            double maxCropHeight = popupHeight * 0.30;
+            if (cropBoxH > maxCropHeight)
+            {
+                cropBoxH = maxCropHeight;
+                cropBoxW = cropBoxH * screenAspect;
+            }
+
+            double imgWidth = 1;
+            double imgHeight = 1;
+            try
+            {
+                using var stream = File.OpenRead(imagePath);
+                var platformImage = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
+                imgWidth = platformImage.Width;
+                imgHeight = platformImage.Height;
+            }
+            catch
+            {
+                imgWidth = 1;
+                imgHeight = 1;
+            }
+
+            double currentScale = Math.Clamp(_configService.BackgroundImageScale, 0.1, 5.0);
+            double offsetLimitX = 0;
+            double offsetLimitY = 0;
+
+            var previewImage = new Image
+            {
+                Source = ImageSource.FromFile(imagePath),
+                WidthRequest = cropBoxW,
+                HeightRequest = cropBoxH,
+                Aspect = Aspect.AspectFit,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            };
+
+            void UpdatePreviewBounds(bool keepCurrentOffset)
+            {
+                var baseScale = Math.Min(cropBoxW / imgWidth, cropBoxH / imgHeight);
+                var renderedWidth = imgWidth * baseScale * currentScale;
+                var renderedHeight = imgHeight * baseScale * currentScale;
+                offsetLimitX = Math.Abs(renderedWidth - cropBoxW) / 2;
+                offsetLimitY = Math.Abs(renderedHeight - cropBoxH) / 2;
+
+                previewImage.WidthRequest = renderedWidth;
+                previewImage.HeightRequest = renderedHeight;
+
+                if (!keepCurrentOffset)
+                {
+                    previewImage.TranslationX = offsetLimitX <= 0 ? 0 : _configService.BackgroundImageOffsetX * offsetLimitX;
+                    previewImage.TranslationY = offsetLimitY <= 0 ? 0 : _configService.BackgroundImageOffsetY * offsetLimitY;
+                    return;
+                }
+
+                previewImage.TranslationX = Clamp(previewImage.TranslationX, -offsetLimitX, offsetLimitX);
+                previewImage.TranslationY = Clamp(previewImage.TranslationY, -offsetLimitY, offsetLimitY);
+            }
+
+            UpdatePreviewBounds(keepCurrentOffset: false);
+
+            var cropContainer = new Grid
+            {
+                WidthRequest = cropBoxW,
+                HeightRequest = cropBoxH,
+                IsClippedToBounds = true,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                Children = { previewImage }
+            };
+
+            const double viewportOutlineThickness = 2;
+
+            var previewCard = new Border
+            {
+                BackgroundColor = Colors.Black.WithAlpha(0.08f),
+                Padding = 8,
+                StrokeThickness = 0,
+                StrokeShape = new RoundRectangle { CornerRadius = 24 },
+                HorizontalOptions = LayoutOptions.Center,
+                Content = new Grid
+                {
+                    WidthRequest = cropBoxW + viewportOutlineThickness * 2,
+                    HeightRequest = cropBoxH + viewportOutlineThickness * 2,
+                    Children =
+                    {
+                        cropContainer,
+                        new Border
+                        {
+                            BackgroundColor = Colors.Transparent,
+                            Stroke = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                            StrokeThickness = viewportOutlineThickness,
+                            StrokeShape = new Rectangle(),
+                            WidthRequest = cropBoxW + viewportOutlineThickness * 2,
+                            HeightRequest = cropBoxH + viewportOutlineThickness * 2,
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center,
+                            InputTransparent = true
+                        }
+                    }
+                }
+            };
+
+            var panGesture = new PanGestureRecognizer();
+            double panStartX = 0;
+            double panStartY = 0;
+            panGesture.PanUpdated += (s, args) =>
+            {
+                switch (args.StatusType)
+                {
+                    case GestureStatus.Started:
+                        panStartX = previewImage.TranslationX;
+                        panStartY = previewImage.TranslationY;
+                        break;
+                    case GestureStatus.Running:
+                        previewImage.TranslationX = Clamp(panStartX + args.TotalX, -offsetLimitX, offsetLimitX);
+                        previewImage.TranslationY = Clamp(panStartY + args.TotalY, -offsetLimitY, offsetLimitY);
+                        break;
+                }
+            };
+            cropContainer.GestureRecognizers.Add(panGesture);
+
+            var zoomLabel = new Label
+            {
+                Text = $"缩放 {currentScale * 100:F0}%",
+                FontSize = 14,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                HorizontalOptions = LayoutOptions.End
+            };
+
+            bool isUpdatingZoomControls = false;
+            var zoomEntry = new Entry
+            {
+                Text = $"{currentScale * 100:F0}",
+                Keyboard = Keyboard.Numeric,
+                HorizontalTextAlignment = TextAlignment.Center,
+                ClearButtonVisibility = ClearButtonVisibility.WhileEditing,
+                WidthRequest = 88,
+                MaxLength = 3,
+                BackgroundColor = (Color?)Application.Current?.Resources["BtnBgSec"] ?? Colors.White,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
+            };
+
+            void SetZoomScale(double newScale, bool keepCurrentOffset)
+            {
+                currentScale = Math.Clamp(newScale, 0, 5.0);
+                isUpdatingZoomControls = true;
+                zoomLabel.Text = $"缩放 {currentScale * 100:F0}%";
+                zoomEntry.Text = $"{currentScale * 100:F0}";
+                isUpdatingZoomControls = false;
+                UpdatePreviewBounds(keepCurrentOffset);
+            }
+
+            var zoomSlider = new Slider
+            {
+                Minimum = 0,
+                Maximum = 5,
+                Value = currentScale,
+                MinimumTrackColor = (Color?)Application.Current?.Resources["TextAccent"] ?? Colors.Blue,
+                MaximumTrackColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
+                ThumbColor = (Color?)Application.Current?.Resources["TextAccent"] ?? Colors.Blue
+            };
+            zoomSlider.ValueChanged += (s, args) =>
+            {
+                if (isUpdatingZoomControls)
+                    return;
+
+                SetZoomScale(args.NewValue, keepCurrentOffset: true);
+            };
+
+            zoomEntry.TextChanged += (s, args) =>
+            {
+                if (isUpdatingZoomControls)
+                    return;
+
+                if (!double.TryParse(args.NewTextValue, out var percent))
+                    return;
+
+                var scale = percent / 100d;
+                zoomSlider.Value = scale;
+                SetZoomScale(scale, keepCurrentOffset: true);
+            };
+
+            zoomEntry.Unfocused += (s, args) =>
+            {
+                if (double.TryParse(zoomEntry.Text, out var percent))
+                {
+                    var scale = percent / 100d;
+                    SetZoomScale(scale, keepCurrentOffset: true);
+                }
+                else
+                {
+                    SetZoomScale(currentScale, keepCurrentOffset: true);
+                }
+            };
+
+            var zoomInputRow = new HorizontalStackLayout
+            {
+                Spacing = 8,
+                HorizontalOptions = LayoutOptions.End,
+                Children =
+                {
+                    new Label
+                    {
+                        Text = "填入缩放值",
+                        FontSize = 13,
+                        TextColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
+                        VerticalTextAlignment = TextAlignment.Center
+                    },
+                    zoomEntry,
+                    new Label
+                    {
+                        Text = "%",
+                        FontSize = 13,
+                        TextColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
+                        VerticalTextAlignment = TextAlignment.Center
+                    }
+                }
+            };
+
+            var cancelBtn = new Button
+            {
+                Text = "取消",
+                FontSize = 15,
+                BackgroundColor = (Color?)Application.Current?.Resources["BtnBgSec"] ?? Colors.LightGray,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                CornerRadius = 12,
+                HeightRequest = 44,
+                HorizontalOptions = LayoutOptions.Fill,
+                Shadow = null
+            };
+            cancelBtn.Clicked += async (s, args) => await BgCropMenu.HideAsync();
+
+            var confirmBtn = new Button
+            {
+                Text = "确认",
+                FontSize = 15,
+                FontAttributes = FontAttributes.Bold,
+                BackgroundColor = (Color?)Application.Current?.Resources["BtnBgMain"] ?? Colors.LightGray,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                CornerRadius = 12,
+                HeightRequest = 44,
+                HorizontalOptions = LayoutOptions.Fill,
+                Shadow = null
+            };
+
+            confirmBtn.Clicked += async (s, args) =>
+            {
+                _configService.BackgroundImageScale = currentScale;
+                _configService.BackgroundImageOffsetX = offsetLimitX <= 0 ? 0 : previewImage.TranslationX / offsetLimitX;
+                _configService.BackgroundImageOffsetY = offsetLimitY <= 0 ? 0 : previewImage.TranslationY / offsetLimitY;
+                await BgCropMenu.HideAsync();
+            };
+
+            var hintLabel = new Label
+            {
+                Text = "导入后会先完整显示整张图片。拖动图片可调整位置，超出预览框的部分会自动裁切，缩放范围 10% 到 500%。",
+                FontSize = 12,
+                TextColor = (Color?)Application.Current?.Resources["TextSec"] ?? Colors.Gray,
+                HorizontalTextAlignment = TextAlignment.Center,
+                LineBreakMode = LineBreakMode.WordWrap
+            };
+
+            var actionGrid = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitionCollection
+                {
+                    new ColumnDefinition(GridLength.Star),
+                    new ColumnDefinition(GridLength.Star)
+                },
+                ColumnSpacing = 12
+            };
+            Grid.SetColumn(cancelBtn, 0);
+            Grid.SetColumn(confirmBtn, 1);
+            actionGrid.Children.Add(cancelBtn);
+            actionGrid.Children.Add(confirmBtn);
+
+            var body = new VerticalStackLayout
+            {
+                Spacing = 10,
+                Children =
+                {
+                    new Label
+                    {
+                        Text = "裁剪背景图",
+                        FontSize = 20,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
+                    },
+                    previewCard,
+                    zoomLabel,
+                    zoomInputRow,
+                    zoomSlider,
+                    hintLabel,
+                    actionGrid
+                }
+            };
+
+            var content = new Border
+            {
+                StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 18 },
+                BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
+                Padding = 22,
+                WidthRequest = popupWidth,
+                MaximumHeightRequest = popupHeight,
+                Content = body
+            };
+
+            await PopupWindow.ShowCustomAsync(
+                host: BgCropMenu,
+                content: content,
+                animationMode: MenuAnimationMode.PopUp,
+                showOverlay: true,
+                horizontalAlign: LayoutOptions.Center,
+                verticalAlign: LayoutOptions.Center,
+                margin: new Thickness(0),
+                overlayOpacity: 0.36
+            );
+        }
+
+        private static double Clamp(double value, double min, double max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
         }
     }
 }

@@ -18,6 +18,8 @@ public partial class MainPage : ContentPage
     private readonly ViewModels.MainViewModel _viewModel;
     private readonly DatabaseService _dbService;
     private readonly ConfigService _configService;
+    private double _backgroundImageWidth;
+    private double _backgroundImageHeight;
 
     public MainPage(DatabaseService dbService, ViewModels.MainViewModel viewModel, ConfigService configService)
     {
@@ -30,6 +32,7 @@ public partial class MainPage : ContentPage
         BindingContext = _viewModel;
 
         ThemeHelper.SyncStatusBar(this, _configService);
+        BgImageHost.SizeChanged += (_, _) => ApplyBackgroundImageTransform();
     }
 
     protected override async void OnAppearing()
@@ -37,6 +40,10 @@ public partial class MainPage : ContentPage
         base.OnAppearing();
 
         ThemeHelper.SyncStatusBar(this, _configService);
+
+#if ANDROID
+        Schedule2._0.Services.WidgetHelper.ForceRefreshWidget();
+#endif
 
         if (!_configService.PrivacyPolicyAccepted)
         {
@@ -57,12 +64,61 @@ public partial class MainPage : ContentPage
         {
             BgImage.Source = ImageSource.FromFile(path);
             BgImage.IsVisible = true;
+            LoadBackgroundImageMetadata(path);
+            ApplyBackgroundImageTransform();
         }
         else
         {
             BgImage.IsVisible = false;
             BgImage.Source = null;
+            _backgroundImageWidth = 0;
+            _backgroundImageHeight = 0;
         }
+    }
+
+    private void LoadBackgroundImageMetadata(string path)
+    {
+        try
+        {
+            using var stream = File.OpenRead(path);
+            var image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
+            _backgroundImageWidth = image.Width;
+            _backgroundImageHeight = image.Height;
+        }
+        catch
+        {
+            _backgroundImageWidth = 0;
+            _backgroundImageHeight = 0;
+        }
+    }
+
+    private void ApplyBackgroundImageTransform()
+    {
+        if (!BgImage.IsVisible || _backgroundImageWidth <= 0 || _backgroundImageHeight <= 0)
+        {
+            return;
+        }
+
+        var viewportWidth = BgImageHost.Width;
+        var viewportHeight = BgImageHost.Height;
+        if (viewportWidth <= 0 || viewportHeight <= 0)
+        {
+            return;
+        }
+
+        var baseScale = Math.Min(viewportWidth / _backgroundImageWidth, viewportHeight / _backgroundImageHeight);
+        var renderedWidth = _backgroundImageWidth * baseScale * _configService.BackgroundImageScale;
+        var renderedHeight = _backgroundImageHeight * baseScale * _configService.BackgroundImageScale;
+        var offsetLimitX = Math.Abs(renderedWidth - viewportWidth) / 2;
+        var offsetLimitY = Math.Abs(renderedHeight - viewportHeight) / 2;
+
+        BgImage.AnchorX = 0.5;
+        BgImage.AnchorY = 0.5;
+        BgImage.WidthRequest = renderedWidth;
+        BgImage.HeightRequest = renderedHeight;
+        BgImage.Scale = 1;
+        BgImage.TranslationX = offsetLimitX <= 0 ? 0 : _configService.BackgroundImageOffsetX * offsetLimitX;
+        BgImage.TranslationY = offsetLimitY <= 0 ? 0 : _configService.BackgroundImageOffsetY * offsetLimitY;
     }
 
     protected override bool OnBackButtonPressed()
@@ -623,4 +679,3 @@ public partial class MainPage : ContentPage
         }
     }
 }
-
