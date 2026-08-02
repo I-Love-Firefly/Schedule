@@ -119,7 +119,7 @@ namespace Schedule2._0.Services
             // 这里可根据实际业务逻辑判断
             // 例如：return Preferences.Default.Get("is_vip", false);
             // 目前默认返回false，可根据需要修改
-            return Preferences.Default.Get("is_vip", false);
+            return Preferences.Default.Get("is_vip", true);
         }
     }
 }
