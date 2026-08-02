@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Schedule2._0.Views.ScheduleImageImportPage"
+             Title="从截图导入课表"
+             BackgroundColor="{DynamicResource AppBg}">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
+        <VerticalStackLayout Grid.Row="0" Spacing="8">
+            <Label Text="离线截图识别" FontSize="24" FontAttributes="Bold" TextColor="{DynamicResource TextMain}" />
+            <Label Text="请选择包含完整星期表头、课程区域以及时间或节次的清晰网格课表截图。图片只在本机处理。"
+                   FontSize="13" TextColor="{DynamicResource TextSec}" />
+            <Button x:Name="PickImageButton" Text="选择课程表截图" Clicked="OnPickImageClicked"
+                    BackgroundColor="{DynamicResource BtnBgMain}" TextColor="{DynamicResource TextMain}" />
+            <ActivityIndicator x:Name="BusyIndicator" IsVisible="False" IsRunning="False" />
+            <Label x:Name="StatusLabel" TextColor="{DynamicResource TextSec}" LineBreakMode="WordWrap" />
+        </VerticalStackLayout>
+
+        <CollectionView x:Name="CoursesView" Grid.Row="1" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="识别后的课程会显示在这里，并可在保存前逐项修改。"
+                       HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                       TextColor="{DynamicResource TextSec}" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="{DynamicResource CardBg}" StrokeThickness="0" Padding="12" Margin="0,0,0,10">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <VerticalStackLayout Spacing="7">
+                            <Entry Text="{Binding Name, Mode=TwoWay}" Placeholder="课程名称（必填）" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Entry Grid.Column="0" Text="{Binding DayOfWeek, Mode=TwoWay}" Placeholder="Monday" />
+                                <Entry Grid.Column="1" Text="{Binding Location, Mode=TwoWay}" Placeholder="教室/地点" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Entry Grid.Column="0" Text="{Binding StartTime, Mode=TwoWay}" Placeholder="08.00am" />
+                                <Entry Grid.Column="1" Text="{Binding EndTime, Mode=TwoWay}" Placeholder="09.40am" />
+                            </Grid>
+                            <Entry Text="{Binding Teacher, Mode=TwoWay}" Placeholder="教师（选填）" />
+                            <Button Text="删除此条" Clicked="OnDeleteCourseClicked" CommandParameter="{Binding .}"
+                                    FontSize="12" HeightRequest="36" HorizontalOptions="End"
+                                    BackgroundColor="Transparent" TextColor="#D14B4B" />
+                            <Label Text="{Binding SourceText, StringFormat='识别原文：{0}'}" FontSize="11"
+                                   TextColor="{DynamicResource TextSec}" LineBreakMode="TailTruncation" MaxLines="2" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Button Grid.Column="0" Text="重新选择" Clicked="OnPickImageClicked"
+                    BackgroundColor="{DynamicResource BtnBgSec}" TextColor="{DynamicResource TextMain}" />
+            <Button x:Name="SaveButton" Grid.Column="1" Text="确认并写入" Clicked="OnSaveClicked" IsEnabled="False"
+                    BackgroundColor="{DynamicResource BtnBgMain}" TextColor="{DynamicResource TextMain}" />
+        </Grid>
+    </Grid>
+</ContentPage>

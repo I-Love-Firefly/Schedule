@@ -38,9 +38,16 @@ public class CourseWidget : AppWidgetProvider
         foreach (var widgetId in appWidgetIds)
         {
             var views = new RemoteViews(context.PackageName, Resource.Layout.widget_layout);
+            var now = DateTime.Now;
+
+            // Date and weekday belong to the widget itself, not to course data. Always
+            // refresh them, including immediately after the schedule has been cleared.
+            views.SetTextViewText(Resource.Id.widget_current_date, now.ToString("M月d日"));
+            views.SetTextViewText(Resource.Id.widget_current_day, GetChineseDayOfWeek(now.DayOfWeek));
 
             if (string.IsNullOrEmpty(rawData))
             {
+                views.SetTextViewText(Resource.Id.widget_motto, "今日课表");
                 views.SetTextViewText(Resource.Id.widget_course_name, "请先在App同步");
                 views.SetTextViewText(Resource.Id.widget_location, "暂无课程数据");
                 appWidgetManager.UpdateAppWidget(widgetId, views);
@@ -49,10 +56,6 @@ public class CourseWidget : AppWidgetProvider
 
             try
             {
-                var now = DateTime.Now;
-                views.SetTextViewText(Resource.Id.widget_current_date, now.ToString("M月d日"));
-                views.SetTextViewText(Resource.Id.widget_current_day, GetChineseDayOfWeek(now.DayOfWeek));
-
                 var entries = rawData.Split(new[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
                 var allCourses = entries
                     .Select(e => e.Split(new[] { "##" }, StringSplitOptions.None))

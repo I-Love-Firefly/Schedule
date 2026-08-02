@@ -32,7 +32,6 @@ namespace Schedule2._0
 
             builder.Services
                 .AddScheduleCoreServices()
-                .AddSchoolAdapters()
                 .AddScheduleViewModels()
                 .AddScheduleViews();
 

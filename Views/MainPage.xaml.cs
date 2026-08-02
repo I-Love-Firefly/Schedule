@@ -347,7 +347,7 @@ public partial class MainPage : ContentPage
             await HamburgerMenu.HideAsync();
         }
 
-        var options = new[] { "导入XMUM课程表", "手动导入" };
+        var options = new[] { "从课程表截图导入（离线）", "手动导入" };
         var idx = await PopupWindow.ShowAsync(
             host: ActionMenu,                              // MenuView 实例 - 用于承载弹窗的容器
             title: "",                                     // 弹窗标题 - 显示在顶部的文字（空字符串表示不显示标题）
@@ -366,95 +366,7 @@ public partial class MainPage : ContentPage
         if (idx == 0)
         {
             await ActionMenu.HideAsync();
-
-            // 构建确认弹窗内容
-            var tcs = new TaskCompletionSource<bool>();
-
-            var messageLabel = new Label
-            {
-                Padding = new Thickness(20, 20, 20, 10),
-                LineBreakMode = LineBreakMode.WordWrap,
-                FormattedText = new FormattedString
-                {
-                    Spans =
-                    {
-                        new Span
-                        {
-                            Text = "即将使用app内置浏览器跳转到学校教务系统，请自行完成登录步骤。",
-                            TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
-                            FontSize = 15
-                        },
-                        new Span
-                        {
-                            Text = "本应用不会收集任何账号信息！",
-                            TextColor = Colors.Red,
-                            FontSize = 15,
-                            FontAttributes = FontAttributes.Bold
-                        }
-                    }
-                }
-            };
-
-            var buttonStack = new Grid
-            {
-                ColumnDefinitions = new ColumnDefinitionCollection
-                {
-                    new ColumnDefinition(GridLength.Star),
-                    new ColumnDefinition(GridLength.Star)
-                },
-                Padding = new Thickness(10, 0, 10, 10)
-            };
-
-            var cancelBtn = PopupWindow.CreateButton("取消", fontSize: 15);
-            cancelBtn.Clicked += async (s2, e2) =>
-            {
-                tcs.TrySetResult(false);
-                await ActionMenu.HideAsync();
-            };
-
-            var confirmBtn = PopupWindow.CreateButton("确认", fontSize: 15, fontAttributes: FontAttributes.Bold);
-            confirmBtn.Clicked += async (s2, e2) =>
-            {
-                tcs.TrySetResult(true);
-                await ActionMenu.HideAsync();
-            };
-
-            Grid.SetColumn(cancelBtn, 0);
-            Grid.SetColumn(confirmBtn, 1);
-            buttonStack.Children.Add(cancelBtn);
-            buttonStack.Children.Add(confirmBtn);
-
-            var content = new VerticalStackLayout { Spacing = 0 };
-            content.Children.Add(messageLabel);
-            content.Children.Add(PopupWindow.CreateSeparator());
-            content.Children.Add(buttonStack);
-
-            var card = new Border
-            {
-                BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
-                Padding = 0,
-                StrokeThickness = 0,
-                StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 16 },
-                WidthRequest = 320,
-                Content = content
-            };
-
-            await PopupWindow.ShowCustomAsync(
-                host: ActionMenu,
-                content: card,
-                animationMode: MenuAnimationMode.PopUp,
-                showOverlay: true,
-                horizontalAlign: LayoutOptions.Center,
-                verticalAlign: LayoutOptions.Center,
-                margin: new Thickness(0),
-                overlayOpacity: 0.3
-            );
-
-            bool confirmed = await tcs.Task;
-            if (confirmed)
-            {
-                await Shell.Current.GoToAsync($"{nameof(LoginPage)}?school={SchoolCodes.Xmum}");
-            }
+            await Shell.Current.GoToAsync(nameof(ScheduleImageImportPage));
         }
         else if (idx == 1)
         {

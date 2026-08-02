@@ -24,8 +24,8 @@ namespace Schedule2._0
                 });
             });
 
-            Routing.RegisterRoute(nameof(Views.LoginPage), typeof(Views.LoginPage));
             Routing.RegisterRoute(nameof(AddCoursePage), typeof(AddCoursePage));
+            Routing.RegisterRoute(nameof(ScheduleImageImportPage), typeof(ScheduleImageImportPage));
             Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
         }
 

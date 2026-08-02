@@ -32,6 +32,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Tests\**\*.cs" />
+	  <None Remove="Tests\**\*" />
 	  <None Include="App.xaml.cs" />
 	  <None Include="AppShell.xaml.cs" />
 	  <None Include="Views\AddCoursePage.xaml.cs" />
@@ -51,6 +53,10 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+	</ItemGroup>
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<!-- Bundled Chinese/Latin OCR model: recognition works without a network connection. -->
+		<PackageReference Include="Xamarin.Google.MLKit.TextRecognition.Chinese" Version="116.0.0.9" />
 	</ItemGroup>
 
 	<ItemGroup>
