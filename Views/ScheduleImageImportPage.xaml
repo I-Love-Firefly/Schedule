@@ -7,8 +7,15 @@
     <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
         <VerticalStackLayout Grid.Row="0" Spacing="8">
             <Label Text="离线截图识别" FontSize="24" FontAttributes="Bold" TextColor="{DynamicResource TextMain}" />
-            <Label Text="请选择包含完整星期表头、课程区域以及时间或节次的清晰网格课表截图。图片只在本机处理。"
+            <Label Text="图片先由离线 OCR 提取文字和坐标，再由本地小模型结构化；整个识别过程不上传图片。"
                    FontSize="13" TextColor="{DynamicResource TextSec}" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Label x:Name="ModelStatusLabel" VerticalTextAlignment="Center" FontSize="12"
+                       TextColor="{DynamicResource TextSec}" />
+                <Button Grid.Column="1" x:Name="InstallModelButton" Text="安装本地模型"
+                        Clicked="OnInstallModelClicked" FontSize="12" HeightRequest="38"
+                        BackgroundColor="{DynamicResource BtnBgSec}" TextColor="{DynamicResource TextMain}" />
+            </Grid>
             <Button x:Name="PickImageButton" Text="选择课程表截图" Clicked="OnPickImageClicked"
                     BackgroundColor="{DynamicResource BtnBgMain}" TextColor="{DynamicResource TextMain}" />
             <ActivityIndicator x:Name="BusyIndicator" IsVisible="False" IsRunning="False" />

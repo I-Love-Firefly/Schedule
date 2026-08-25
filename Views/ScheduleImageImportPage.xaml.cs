@@ -8,17 +8,56 @@ namespace Schedule2._0.Views;
 public partial class ScheduleImageImportPage : ContentPage
 {
     private readonly IOcrService _ocrService;
-    private readonly ScheduleImageParser _parser;
+    private readonly IScheduleAiService _aiService;
+    private readonly HybridScheduleRecognizer _recognizer;
     private readonly DatabaseService _database;
     private readonly ObservableCollection<RecognizedCourse> _courses = [];
+    private bool _writeAllowed;
 
-    public ScheduleImageImportPage(IOcrService ocrService, ScheduleImageParser parser, DatabaseService database)
+    public ScheduleImageImportPage(
+        IOcrService ocrService,
+        IScheduleAiService aiService,
+        HybridScheduleRecognizer recognizer,
+        DatabaseService database)
     {
         InitializeComponent();
         _ocrService = ocrService;
-        _parser = parser;
+        _aiService = aiService;
+        _recognizer = recognizer;
         _database = database;
         CoursesView.ItemsSource = _courses;
+        UpdateModelStatus();
+    }
+
+    private async void OnInstallModelClicked(object sender, EventArgs e)
+    {
+        if (!_aiService.IsSupported)
+        {
+            await DisplayAlertAsync("设备不支持", "本地课程表 AI 目前需要 arm64 Android 设备。", "确定");
+            return;
+        }
+        var file = await FilePicker.Default.PickAsync(new PickOptions
+        {
+            PickerTitle = $"选择 {_aiService.ModelFileName}",
+            FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+            {
+                [DevicePlatform.Android] = ["application/octet-stream", "application/gguf", "*/*"]
+            })
+        });
+        if (file is null) return;
+        SetBusy(true, "正在复制本地模型，完成后无需网络……");
+        try
+        {
+            await using var stream = await file.OpenReadAsync();
+            await _aiService.InstallModelAsync(stream);
+            UpdateModelStatus();
+            await DisplayAlertAsync("模型已安装", "后续课程表识别可完全离线运行。", "确定");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("安装失败", ex.Message, "确定");
+        }
+        finally { SetBusy(false); }
     }
 
     private async void OnPickImageClicked(object sender, EventArgs e)
@@ -45,18 +84,22 @@ public partial class ScheduleImageImportPage : ContentPage
                 await input.CopyToAsync(output);
 
             var document = await _ocrService.RecognizeAsync(cachePath);
-            var result = _parser.Parse(document);
+            var result = await _recognizer.RecognizeAsync(document);
             _courses.Clear();
             foreach (var course in result.Courses) _courses.Add(course);
+            _writeAllowed = result.IsWriteSafe;
 
             var summary = $"识别到 {_courses.Count} 门课程。请逐项校对后再写入。";
             if (result.Warnings.Count > 0) summary += Environment.NewLine + string.Join(Environment.NewLine, result.Warnings);
+            if (_courses.Count > 0 && !_writeAllowed)
+                summary += Environment.NewLine + "本次结果未通过质量校验，请重新截图或改用手动导入。";
             StatusLabel.Text = summary;
-            SaveButton.IsEnabled = _courses.Count > 0;
+            SaveButton.IsEnabled = _courses.Count > 0 && _writeAllowed;
         }
         catch (Exception ex)
         {
             _courses.Clear();
+            _writeAllowed = false;
             SaveButton.IsEnabled = false;
             StatusLabel.Text = "识别失败。";
             await DisplayAlertAsync("识别失败", ex.Message, "确定");
@@ -107,7 +150,7 @@ public partial class ScheduleImageImportPage : ContentPage
     {
         if (sender is Button { CommandParameter: RecognizedCourse course })
             _courses.Remove(course);
-        SaveButton.IsEnabled = _courses.Count > 0;
+        SaveButton.IsEnabled = _courses.Count > 0 && _writeAllowed;
         StatusLabel.Text = $"当前保留 {_courses.Count} 门课程，请校对后写入。";
     }
 
@@ -148,7 +191,16 @@ public partial class ScheduleImageImportPage : ContentPage
         BusyIndicator.IsVisible = busy;
         BusyIndicator.IsRunning = busy;
         PickImageButton.IsEnabled = !busy;
-        SaveButton.IsEnabled = !busy && _courses.Count > 0;
+        InstallModelButton.IsEnabled = !busy;
+        SaveButton.IsEnabled = !busy && _courses.Count > 0 && _writeAllowed;
         if (message is not null) StatusLabel.Text = message;
+    }
+
+    private void UpdateModelStatus()
+    {
+        ModelStatusLabel.Text = _aiService.IsModelInstalled
+            ? "本地 AI 模型：已安装"
+            : "本地 AI 模型：未安装（仍可使用几何识别）";
+        InstallModelButton.Text = _aiService.IsModelInstalled ? "更换模型" : "安装本地模型";
     }
 }

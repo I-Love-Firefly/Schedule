@@ -28,18 +28,76 @@ public sealed class AndroidOcrService : Java.Lang.Object, IOcrService
         {
             foreach (var line in block.Lines)
             {
-                var box = line.BoundingBox;
-                if (box is null || string.IsNullOrWhiteSpace(line.Text)) continue;
-                regions.Add(new OcrTextRegion(line.Text, box.Left, box.Top, box.Right, box.Bottom));
+                if (line.Elements.Count > 0)
+                {
+                    foreach (var element in line.Elements)
+                    {
+                        var elementBox = element.BoundingBox;
+                        if (elementBox is null || string.IsNullOrWhiteSpace(element.Text)) continue;
+                        regions.Add(new OcrTextRegion(
+                            element.Text,
+                            elementBox.Left,
+                            elementBox.Top,
+                            elementBox.Right,
+                            elementBox.Bottom));
+                    }
+                    continue;
+                }
+
+                var lineBox = line.BoundingBox;
+                if (lineBox is null || string.IsNullOrWhiteSpace(line.Text)) continue;
+                regions.Add(new OcrTextRegion(line.Text, lineBox.Left, lineBox.Top, lineBox.Right, lineBox.Bottom));
             }
         }
+
+        var pixels = new int[bitmap.Width * bitmap.Height];
+        bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
 
         return new OcrDocument
         {
             ImageWidth = bitmap.Width,
             ImageHeight = bitmap.Height,
-            Regions = regions
+            Regions = regions,
+            HorizontalLines = DetectGridLines(pixels, bitmap.Width, bitmap.Height, horizontal: true),
+            VerticalLines = DetectGridLines(pixels, bitmap.Width, bitmap.Height, horizontal: false)
         };
+    }
+
+    private static IReadOnlyList<float> DetectGridLines(int[] pixels, int width, int height, bool horizontal)
+    {
+        var length = horizontal ? height : width;
+        var crossLength = horizontal ? width : height;
+        var counts = new int[length];
+
+        for (var y = 0; y < height; y++)
+        for (var x = 0; x < width; x++)
+        {
+            var color = pixels[y * width + x];
+            var red = (color >> 16) & 0xff;
+            var green = (color >> 8) & 0xff;
+            var blue = color & 0xff;
+            if (red < 145 && green < 145 && blue < 145)
+                counts[horizontal ? y : x]++;
+        }
+
+        var threshold = (int)(crossLength * (horizontal ? 0.28 : 0.35));
+        var candidates = Enumerable.Range(0, length).Where(i => counts[i] >= threshold).ToList();
+        if (candidates.Count == 0) return [];
+
+        var merged = new List<float>();
+        var group = new List<int> { candidates[0] };
+        for (var i = 1; i < candidates.Count; i++)
+        {
+            if (candidates[i] - group[^1] <= 3)
+                group.Add(candidates[i]);
+            else
+            {
+                merged.Add((float)group.Average());
+                group = [candidates[i]];
+            }
+        }
+        merged.Add((float)group.Average());
+        return merged;
     }
 
     private static Task<Bitmap> DecodeBitmapAsync(string path, CancellationToken cancellationToken) =>

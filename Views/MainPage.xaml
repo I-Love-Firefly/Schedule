@@ -140,7 +140,7 @@
                                             <TapGestureRecognizer Tapped="OnCourseCardClicked" />
                                         </Border.GestureRecognizers>
 
-                                        <Grid ColumnDefinitions="8,*,3*" ColumnSpacing="0">
+                                        <Grid ColumnDefinitions="8,92,*" ColumnSpacing="0">
                                             <!-- 蓝色色块 -->
                                             <BoxView Grid.Column="0"
                                                      WidthRequest="8"
@@ -157,7 +157,9 @@
                                                 <Label Text="{Binding StartTime, Converter={StaticResource TimeFormatConverter}}"
                                                        FontSize="13"
                                                        FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center" />
+                                                       HorizontalTextAlignment="Center"
+                                                       LineBreakMode="NoWrap"
+                                                       MaxLines="1" />
                                                 <BoxView HeightRequest="12"
                                                          WidthRequest="1.5"
                                                          HorizontalOptions="Center"
@@ -166,7 +168,9 @@
                                                 <Label Text="{Binding EndTime, Converter={StaticResource TimeFormatConverter}}"
                                                        FontSize="13"
                                                        FontAttributes="Bold"
-                                                       HorizontalTextAlignment="Center" />
+                                                       HorizontalTextAlignment="Center"
+                                                       LineBreakMode="NoWrap"
+                                                       MaxLines="1" />
                                             </VerticalStackLayout>
                                             <!-- 课程内容 -->
                                             <VerticalStackLayout Grid.Column="2"

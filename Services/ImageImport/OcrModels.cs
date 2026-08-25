@@ -18,6 +18,8 @@ public sealed class OcrDocument
     public int ImageWidth { get; init; }
     public int ImageHeight { get; init; }
     public IReadOnlyList<OcrTextRegion> Regions { get; init; } = [];
+    public IReadOnlyList<float> HorizontalLines { get; init; } = [];
+    public IReadOnlyList<float> VerticalLines { get; init; } = [];
 }
 
 public interface IOcrService

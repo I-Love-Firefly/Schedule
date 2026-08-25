@@ -1,0 +1,48 @@
+### model
+model_name_or_path: artifacts/models/MiniCPM-V-4.6
+trust_remote_code: true
+flash_attn: sdpa
+quantization_bit: 4
+quantization_method: bnb
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target: all
+freeze_vision_tower: true
+freeze_multi_modal_projector: true
+
+### dataset
+dataset: schedule_synthetic_train
+dataset_dir: artifacts/ai-data/synthetic-v1
+template: minicpm_v_4_6
+cutoff_len: 4096
+max_samples: 1
+preprocessing_num_workers: 1
+dataloader_num_workers: 0
+overwrite_cache: true
+
+### output
+output_dir: artifacts/ai-training/minicpm-v46-lora-smoke
+logging_steps: 1
+save_steps: 1
+save_total_limit: 1
+plot_loss: false
+overwrite_output_dir: true
+report_to: none
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 1
+learning_rate: 1.0e-4
+max_steps: 1
+lr_scheduler_type: cosine
+warmup_ratio: 0.0
+bf16: true
+gradient_checkpointing: true
+use_reentrant_gc: false
+ddp_timeout: 180000000

@@ -1,0 +1,47 @@
+### model
+model_name_or_path: artifacts/models/MiniCPM5-1B
+adapter_name_or_path: artifacts/ai-training/minicpm5-layout-lora-stage1/checkpoint-120
+flash_attn: sdpa
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target: all
+
+### dataset
+dataset: schedule_layout_train
+dataset_dir: artifacts/ai-data/layout-v1
+template: qwen3_nothink
+cutoff_len: 4096
+max_samples: 600
+preprocessing_num_workers: 4
+dataloader_num_workers: 0
+overwrite_cache: true
+
+### output
+output_dir: artifacts/ai-training/minicpm5-layout-lora-stage2
+logging_steps: 10
+save_steps: 160
+save_total_limit: 3
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: none
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 1
+learning_rate: 5.0e-5
+max_steps: 480
+lr_scheduler_type: cosine
+warmup_steps: 12
+bf16: true
+gradient_checkpointing: true
+use_reentrant_gc: false
+seed: 20260826
+data_seed: 20260826
+ddp_timeout: 180000000

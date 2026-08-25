@@ -57,6 +57,7 @@
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
 		<!-- Bundled Chinese/Latin OCR model: recognition works without a network connection. -->
 		<PackageReference Include="Xamarin.Google.MLKit.TextRecognition.Chinese" Version="116.0.0.9" />
+		<AndroidNativeLibrary Include="Platforms\Android\jniLibs\**\*.so" />
 	</ItemGroup>
 
 	<ItemGroup>

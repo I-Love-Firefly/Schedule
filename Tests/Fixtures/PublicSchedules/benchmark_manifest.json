@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "samples": [
+    {
+      "image": "01_scut_class_schedule.png",
+      "documentType": "weekly_schedule",
+      "expectedCourseCountMin": 20,
+      "expectedCourseCountMax": 22,
+      "split": "unseen-template-test"
+    },
+    {
+      "image": "02_jnu_class_schedule.png",
+      "documentType": "weekly_schedule",
+      "expectedCourseCountMin": 15,
+      "expectedCourseCountMax": 17,
+      "split": "unseen-template-test"
+    },
+    {
+      "image": "03_nju_department_schedule.png",
+      "documentType": "weekly_schedule",
+      "expectedCourseCountMin": 13,
+      "expectedCourseCountMax": 15,
+      "split": "unseen-template-test"
+    },
+    {
+      "image": "04_shnu_class_schedule.png",
+      "documentType": "weekly_schedule",
+      "expectedCourseCountMin": 6,
+      "expectedCourseCountMax": 6,
+      "split": "unseen-template-test"
+    },
+    {
+      "image": "05_ujn_graduate_schedule.png",
+      "documentType": "weekly_schedule",
+      "expectedCourseCountMin": 9,
+      "expectedCourseCountMax": 11,
+      "split": "unseen-template-test"
+    },
+    {
+      "image": "06_uestc_graduate_schedule.png",
+      "documentType": "other",
+      "expectedCourseCountMin": 0,
+      "expectedCourseCountMax": 0,
+      "split": "unseen-template-test"
+    }
+  ]
+}

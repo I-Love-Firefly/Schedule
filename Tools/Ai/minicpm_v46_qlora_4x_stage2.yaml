@@ -1,0 +1,54 @@
+### model
+model_name_or_path: artifacts/models/MiniCPM-V-4.6
+adapter_name_or_path: artifacts/ai-training/minicpm-v46-lora-stage1/checkpoint-80
+trust_remote_code: true
+flash_attn: sdpa
+quantization_bit: 4
+quantization_method: bnb
+upcast_layernorm: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target: all
+freeze_vision_tower: true
+freeze_multi_modal_projector: true
+
+### dataset
+dataset: schedule_synthetic_train_short
+dataset_dir: artifacts/ai-data/synthetic-v1
+template: minicpm_v_4_6
+cutoff_len: 4096
+max_samples: 380
+preprocessing_num_workers: 4
+dataloader_num_workers: 0
+overwrite_cache: true
+
+### output
+output_dir: artifacts/ai-training/minicpm-v46-qlora-4x-stage2
+logging_steps: 2
+save_steps: 5
+save_total_limit: 3
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: none
+resume_from_checkpoint: artifacts/ai-training/minicpm-v46-qlora-4x-stage2/checkpoint-10
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 1
+learning_rate: 5.0e-5
+max_steps: 20
+lr_scheduler_type: cosine
+warmup_steps: 5
+bf16: true
+gradient_checkpointing: true
+use_reentrant_gc: false
+seed: 20260826
+data_seed: 20260826
+ddp_timeout: 180000000
