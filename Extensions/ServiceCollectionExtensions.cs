@@ -16,6 +16,9 @@ namespace Schedule2._0.Extensions
             services.AddSingleton<ThemeService>();
             services.AddSingleton<ScheduleImageParser>();
             services.AddSingleton<HybridScheduleRecognizer>();
+            services.AddSingleton<ScheduleRecognitionCoordinator>();
+            services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(75) });
+            services.AddSingleton<ICloudScheduleAiService, CloudScheduleAiService>();
 #if ANDROID
             services.AddSingleton<IOcrService, Schedule2._0.Platforms.Android.AndroidOcrService>();
             services.AddSingleton<IScheduleAiService, Schedule2._0.Platforms.Android.AndroidScheduleAiService>();

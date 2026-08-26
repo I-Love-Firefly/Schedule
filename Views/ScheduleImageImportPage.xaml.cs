@@ -9,23 +9,27 @@ public partial class ScheduleImageImportPage : ContentPage
 {
     private readonly IOcrService _ocrService;
     private readonly IScheduleAiService _aiService;
-    private readonly HybridScheduleRecognizer _recognizer;
+    private readonly ScheduleRecognitionCoordinator _recognizer;
     private readonly DatabaseService _database;
+    private readonly ConfigService _configService;
     private readonly ObservableCollection<RecognizedCourse> _courses = [];
     private bool _writeAllowed;
 
     public ScheduleImageImportPage(
         IOcrService ocrService,
         IScheduleAiService aiService,
-        HybridScheduleRecognizer recognizer,
-        DatabaseService database)
+        ScheduleRecognitionCoordinator recognizer,
+        DatabaseService database,
+        ConfigService configService)
     {
         InitializeComponent();
         _ocrService = ocrService;
         _aiService = aiService;
         _recognizer = recognizer;
         _database = database;
+        _configService = configService;
         CoursesView.ItemsSource = _courses;
+        CloudRecognitionSwitch.IsToggled = _configService.CloudRecognitionEnabled;
         UpdateModelStatus();
     }
 
@@ -75,7 +79,9 @@ public partial class ScheduleImageImportPage : ContentPage
         });
         if (file is null) return;
 
-        SetBusy(true, "正在本机识别图片，无需网络……");
+        SetBusy(true, _configService.CloudRecognitionEnabled
+            ? "正在使用云端 DeepSeek 识别；失败时会自动回退到本地……"
+            : "正在本机识别图片，无需网络……");
         var cachePath = Path.Combine(FileSystem.CacheDirectory, $"schedule-ocr-{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}");
         try
         {
@@ -84,23 +90,27 @@ public partial class ScheduleImageImportPage : ContentPage
                 await input.CopyToAsync(output);
 
             var document = await _ocrService.RecognizeAsync(cachePath);
-            var result = await _recognizer.RecognizeAsync(document);
+            var result = await _recognizer.RecognizeAsync(cachePath, document);
             _courses.Clear();
             foreach (var course in result.Courses) _courses.Add(course);
             _writeAllowed = result.IsWriteSafe;
 
-            var summary = $"识别到 {_courses.Count} 门课程。请逐项校对后再写入。";
+            var source = string.IsNullOrWhiteSpace(result.RecognitionSource) ? "" : $"{result.RecognitionSource}：";
+            var summary = $"{source}识别到 {_courses.Count} 门课程。请逐项校对后再写入。";
             if (result.Warnings.Count > 0) summary += Environment.NewLine + string.Join(Environment.NewLine, result.Warnings);
             if (_courses.Count > 0 && !_writeAllowed)
                 summary += Environment.NewLine + "本次结果未通过质量校验，请重新截图或改用手动导入。";
             StatusLabel.Text = summary;
-            SaveButton.IsEnabled = _courses.Count > 0 && _writeAllowed;
+            ReviewConfirmation.IsVisible = _courses.Count > 0 && !_writeAllowed;
+            ReviewCheckBox.IsChecked = false;
+            UpdateSaveButton();
         }
         catch (Exception ex)
         {
             _courses.Clear();
             _writeAllowed = false;
             SaveButton.IsEnabled = false;
+            ReviewConfirmation.IsVisible = false;
             StatusLabel.Text = "识别失败。";
             await DisplayAlertAsync("识别失败", ex.Message, "确定");
         }
@@ -150,9 +160,22 @@ public partial class ScheduleImageImportPage : ContentPage
     {
         if (sender is Button { CommandParameter: RecognizedCourse course })
             _courses.Remove(course);
-        SaveButton.IsEnabled = _courses.Count > 0 && _writeAllowed;
+        UpdateSaveButton();
         StatusLabel.Text = $"当前保留 {_courses.Count} 门课程，请校对后写入。";
     }
+
+    private void OnCloudRecognitionToggled(object sender, ToggledEventArgs e)
+    {
+        _configService.CloudRecognitionEnabled = e.Value;
+        CloudModeLabel.Text = e.Value
+            ? "云端优先：图片将发送到自有服务器，由 DeepSeek 识别；失败自动离线回退。"
+            : "完全离线：仅使用手机 OCR、几何解析和已安装的本地模型。";
+    }
+
+    private void OnReviewConfirmedChanged(object sender, CheckedChangedEventArgs e) => UpdateSaveButton();
+
+    private void UpdateSaveButton() =>
+        SaveButton.IsEnabled = _courses.Count > 0 && (_writeAllowed || ReviewCheckBox.IsChecked);
 
     private static bool TryNormalizeDay(string value, out string normalized)
     {
@@ -192,7 +215,9 @@ public partial class ScheduleImageImportPage : ContentPage
         BusyIndicator.IsRunning = busy;
         PickImageButton.IsEnabled = !busy;
         InstallModelButton.IsEnabled = !busy;
-        SaveButton.IsEnabled = !busy && _courses.Count > 0 && _writeAllowed;
+        CloudRecognitionSwitch.IsEnabled = !busy;
+        ReviewCheckBox.IsEnabled = !busy;
+        SaveButton.IsEnabled = !busy && _courses.Count > 0 && (_writeAllowed || ReviewCheckBox.IsChecked);
         if (message is not null) StatusLabel.Text = message;
     }
 

@@ -37,4 +37,5 @@ public sealed class ScheduleImageParseResult
     public List<RecognizedCourse> Courses { get; init; } = [];
     public List<string> Warnings { get; init; } = [];
     public bool IsWriteSafe { get; set; }
+    public string RecognitionSource { get; set; } = "";
 }

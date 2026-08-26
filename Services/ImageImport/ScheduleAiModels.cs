@@ -101,7 +101,7 @@ public static class AiScheduleJsonParser
         {
             parsed = RecoverCompleteCourseObjects(candidate);
         }
-        if (parsed.SchemaVersion != 1) throw new InvalidDataException("本地模型返回了不支持的数据版本。 ");
+        if (parsed.SchemaVersion != 1) throw new InvalidDataException("AI 模型返回了不支持的数据版本。 ");
         if (parsed.Courses.Count > 60) throw new InvalidDataException("模型输出课程数量异常，已拒绝导入。 ");
         return parsed;
     }
@@ -109,10 +109,10 @@ public static class AiScheduleJsonParser
     private static AiScheduleDocument RecoverCompleteCourseObjects(string candidate)
     {
         if (!candidate.Contains("\"documentType\":\"weekly_schedule\"", StringComparison.Ordinal))
-            throw new InvalidDataException("本地模型没有返回完整 JSON。 ");
+            throw new InvalidDataException("AI 模型没有返回完整 JSON。 ");
         var marker = candidate.IndexOf("\"courses\"", StringComparison.Ordinal);
         var arrayStart = marker < 0 ? -1 : candidate.IndexOf('[', marker);
-        if (arrayStart < 0) throw new InvalidDataException("本地模型没有返回课程数组。 ");
+        if (arrayStart < 0) throw new InvalidDataException("AI 模型没有返回课程数组。 ");
 
         var courses = new List<AiScheduleCourse>();
         var objectStart = -1;
@@ -145,7 +145,7 @@ public static class AiScheduleJsonParser
                 objectStart = -1;
             }
         }
-        if (courses.Count == 0) throw new InvalidDataException("本地模型没有返回完整课程对象。 ");
+        if (courses.Count == 0) throw new InvalidDataException("AI 模型没有返回完整课程对象。 ");
         return new AiScheduleDocument { SchemaVersion = 1, DocumentType = "weekly_schedule", Courses = courses };
     }
 }

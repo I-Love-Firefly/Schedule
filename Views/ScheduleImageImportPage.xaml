@@ -6,9 +6,17 @@
              BackgroundColor="{DynamicResource AppBg}">
     <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
         <VerticalStackLayout Grid.Row="0" Spacing="8">
-            <Label Text="离线截图识别" FontSize="24" FontAttributes="Bold" TextColor="{DynamicResource TextMain}" />
-            <Label Text="图片先由离线 OCR 提取文字和坐标，再由本地小模型结构化；整个识别过程不上传图片。"
+            <Label Text="智能截图识别" FontSize="24" FontAttributes="Bold" TextColor="{DynamicResource TextMain}" />
+            <Label Text="默认优先使用服务器端 DeepSeek；断网、超时或服务异常时自动使用原有离线识别。"
                    FontSize="13" TextColor="{DynamicResource TextSec}" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Label x:Name="CloudModeLabel"
+                       Text="云端优先：图片将发送到自有服务器，由 DeepSeek 识别；失败自动离线回退。"
+                       FontSize="12" LineBreakMode="WordWrap" VerticalTextAlignment="Center"
+                       TextColor="{DynamicResource TextSec}" />
+                <Switch Grid.Column="1" x:Name="CloudRecognitionSwitch" IsToggled="True"
+                        Toggled="OnCloudRecognitionToggled" />
+            </Grid>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                 <Label x:Name="ModelStatusLabel" VerticalTextAlignment="Center" FontSize="12"
                        TextColor="{DynamicResource TextSec}" />
@@ -54,10 +62,16 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
-            <Button Grid.Column="0" Text="重新选择" Clicked="OnPickImageClicked"
+        <Grid Grid.Row="2" RowDefinitions="Auto,Auto" ColumnDefinitions="*,*" ColumnSpacing="10" RowSpacing="6">
+            <HorizontalStackLayout x:Name="ReviewConfirmation" Grid.Row="0" Grid.ColumnSpan="2" IsVisible="False"
+                                   Spacing="6">
+                <CheckBox x:Name="ReviewCheckBox" CheckedChanged="OnReviewConfirmedChanged" />
+                <Label Text="我已逐项核对以上课程，允许写入" VerticalTextAlignment="Center"
+                       FontSize="12" TextColor="{DynamicResource TextSec}" />
+            </HorizontalStackLayout>
+            <Button Grid.Row="1" Grid.Column="0" Text="重新选择" Clicked="OnPickImageClicked"
                     BackgroundColor="{DynamicResource BtnBgSec}" TextColor="{DynamicResource TextMain}" />
-            <Button x:Name="SaveButton" Grid.Column="1" Text="确认并写入" Clicked="OnSaveClicked" IsEnabled="False"
+            <Button x:Name="SaveButton" Grid.Row="1" Grid.Column="1" Text="确认并写入" Clicked="OnSaveClicked" IsEnabled="False"
                     BackgroundColor="{DynamicResource BtnBgMain}" TextColor="{DynamicResource TextMain}" />
         </Grid>
     </Grid>

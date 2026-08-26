@@ -1,0 +1,36 @@
+services:
+  gateway:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    networks: [internal]
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    mem_limit: 384m
+    cpus: 1.5
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      SCHEDULE_AI_HOST: ${SCHEDULE_AI_HOST}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  internal:
+
+volumes:
+  caddy_data:
+  caddy_config:

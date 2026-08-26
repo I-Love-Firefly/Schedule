@@ -1,0 +1,7 @@
+{$SCHEDULE_AI_HOST} {
+    encode zstd gzip
+    request_body {
+        max_size 15MB
+    }
+    reverse_proxy gateway:8080
+}

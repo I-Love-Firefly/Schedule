@@ -14,6 +14,9 @@ namespace Schedule2._0.Services
         private const string BgImageOffsetYKey = "background_image_offset_y";
         private const string WidgetBgColorKey = "widget_bg_color";
         private const string WidgetBgOpacityKey = "widget_bg_opacity";
+        private const string CloudRecognitionEnabledKey = "cloud_schedule_recognition_enabled";
+        private const string CloudRecognitionEndpointKey = "cloud_schedule_recognition_endpoint";
+        private const string DefaultCloudRecognitionEndpoint = "https://schedule-ai.42-193-179-91.sslip.io";
 
 
         /// <summary>
@@ -109,6 +112,21 @@ namespace Schedule2._0.Services
         {
             get => Preferences.Default.Get(WidgetBgOpacityKey, 1.0);
             set => Preferences.Default.Set(WidgetBgOpacityKey, value);
+        }
+
+        /// <summary>
+        /// 优先使用云端多模态模型；请求失败时仍会自动回退到本地识别。
+        /// </summary>
+        public bool CloudRecognitionEnabled
+        {
+            get => Preferences.Default.Get(CloudRecognitionEnabledKey, true);
+            set => Preferences.Default.Set(CloudRecognitionEnabledKey, value);
+        }
+
+        public string CloudRecognitionEndpoint
+        {
+            get => Preferences.Default.Get(CloudRecognitionEndpointKey, DefaultCloudRecognitionEndpoint);
+            set => Preferences.Default.Set(CloudRecognitionEndpointKey, value.TrimEnd('/'));
         }
 
         /// <summary>
