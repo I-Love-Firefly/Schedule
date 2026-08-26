@@ -14,8 +14,8 @@
 
 		<ApplicationTitle>课表助手</ApplicationTitle>
 		<ApplicationId>site.justindividual.schedule</ApplicationId>
-		<ApplicationDisplayVersion>2.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>2.1</ApplicationDisplayVersion>
+		<ApplicationVersion>2</ApplicationVersion>
 
 		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
