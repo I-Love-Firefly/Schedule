@@ -22,6 +22,9 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<SupportedOSPlatformVersion>23.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#121212" />
@@ -51,12 +54,12 @@
 		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.51" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+		<PackageReference Include="sqlite-net-base" Version="1.9.172" />
+		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
 		<!-- Device OCR supplies text and geometry evidence to the API and validates its result. -->
-		<PackageReference Include="Xamarin.Google.MLKit.TextRecognition.Chinese" Version="116.0.0.9" />
+		<PackageReference Include="Xamarin.Google.MLKit.TextRecognition.Chinese" Version="116.0.1.5" />
 	</ItemGroup>
 
 	<ItemGroup>

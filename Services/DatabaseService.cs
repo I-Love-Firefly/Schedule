@@ -11,6 +11,12 @@ namespace Schedule2._0.Services
 {
     public class DatabaseService
     {
+        private static readonly Lazy<bool> SQLiteRuntime = new(() =>
+        {
+            SQLitePCL.Batteries_V2.Init();
+            return true;
+        });
+
         // 1. 移除字段 _serviceProvider
         private SQLiteAsyncConnection? _db;
         private readonly List<string> _dayOrder = new() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
@@ -23,6 +29,7 @@ namespace Schedule2._0.Services
         async Task Init()
         {
             if (_db != null) return;
+            _ = SQLiteRuntime.Value;
             var path = Path.Combine(FileSystem.AppDataDirectory, "schedule.db3");
             _db = new SQLiteAsyncConnection(path);
             await _db.CreateTableAsync<Course>();
