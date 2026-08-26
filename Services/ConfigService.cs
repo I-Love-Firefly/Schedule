@@ -10,7 +10,7 @@ namespace Schedule2._0.Services
         private const string LastUpdateKey = "last_sync_time";
         private const string LegacyPrivacyAcceptedKey = "privacy_policy_accepted";
         private const string PrivacyAcceptedKey = "privacy_policy_accepted_v2_api";
-        private const string Version21UpdateNotesSeenKey = "update_notes_seen_2_1";
+        private const string Version21UpdateNotesSeenKey = "update_notes_seen_2_1_custom_dialog";
         private const string CardOpacityKey = "card_opacity";
         private const string BgImagePathKey = "background_image_path";
         private const string BgImageScaleKey = "background_image_scale";

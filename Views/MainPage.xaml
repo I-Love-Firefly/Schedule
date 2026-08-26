@@ -219,6 +219,7 @@
         <views:MenuView x:Name="PrivacyMenu"
             HorizontalOptions="Fill"
             VerticalOptions="Fill"
+            CloseOnBackgroundTap="False"
             ZIndex="10000" />
     </Grid>
 </ContentPage>

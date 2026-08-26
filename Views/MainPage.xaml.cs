@@ -80,8 +80,70 @@ public partial class MainPage : ContentPage
         using var reader = new StreamReader(stream);
         var updateNotes = await reader.ReadToEndAsync();
 
-        await DisplayAlertAsync("课表助手 2.1 更新", updateNotes, "知道了");
-        _configService.Version21UpdateNotesSeen = true;
+        var tcs = new TaskCompletionSource<bool>();
+        var scrollView = new ScrollView
+        {
+            MaximumHeightRequest = 440,
+            Content = new Label
+            {
+                Text = updateNotes,
+                FontSize = 14,
+                LineBreakMode = LineBreakMode.WordWrap,
+                TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black
+            }
+        };
+
+        var confirmButton = new Button
+        {
+            Text = "知道了",
+            BackgroundColor = (Color?)Application.Current?.Resources["BtnBgMain"] ?? Colors.Blue,
+            TextColor = Colors.White,
+            HorizontalOptions = LayoutOptions.Fill
+        };
+        confirmButton.Clicked += async (_, _) =>
+        {
+            _configService.Version21UpdateNotesSeen = true;
+            await PrivacyMenu.HideAsync();
+            tcs.TrySetResult(true);
+        };
+
+        var content = new Border
+        {
+            StrokeShape = new RoundRectangle { CornerRadius = 18 },
+            BackgroundColor = (Color?)Application.Current?.Resources["CardBg"] ?? Colors.White,
+            Padding = 22,
+            WidthRequest = 340,
+            Content = new VerticalStackLayout
+            {
+                Spacing = 16,
+                Children =
+                {
+                    new Label
+                    {
+                        Text = "课表助手 2.1 更新",
+                        FontSize = 20,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = (Color?)Application.Current?.Resources["TextMain"] ?? Colors.Black,
+                        HorizontalOptions = LayoutOptions.Center
+                    },
+                    scrollView,
+                    PopupWindow.CreateSeparator(),
+                    confirmButton
+                }
+            }
+        };
+
+        await PopupWindow.ShowCustomAsync(
+            host: PrivacyMenu,
+            content: content,
+            animationMode: MenuAnimationMode.PopUp,
+            showOverlay: true,
+            horizontalAlign: LayoutOptions.Center,
+            verticalAlign: LayoutOptions.Center,
+            margin: new Thickness(0),
+            overlayOpacity: 0.4);
+
+        await tcs.Task;
     }
 
     private void LoadBackgroundImage()
