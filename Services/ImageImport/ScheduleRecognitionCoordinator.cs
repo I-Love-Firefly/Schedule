@@ -5,7 +5,6 @@ namespace Schedule2._0.Services.ImageImport;
 
 public sealed class ScheduleRecognitionCoordinator(
     ScheduleImageParser geometryParser,
-    HybridScheduleRecognizer offlineRecognizer,
     ICloudScheduleAiService cloudService)
 {
     private static readonly HashSet<string> Days =
@@ -16,27 +15,13 @@ public sealed class ScheduleRecognitionCoordinator(
         OcrDocument document,
         CancellationToken cancellationToken = default)
     {
-        if (cloudService.IsEnabled)
-        {
-            try
-            {
-                var response = await cloudService.RecognizeAsync(imagePath, document, cancellationToken);
-                var result = BuildCloudResult(document, response);
-                result.RecognitionSource = $"云端大模型（{response.Model}，{response.ElapsedMs / 1000d:F1} 秒）";
-                return result;
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                var fallback = await offlineRecognizer.RecognizeAsync(document, cancellationToken);
-                fallback.RecognitionSource = "本地识别（云端失败后回退）";
-                fallback.Warnings.Insert(0, $"云端识别不可用，已自动回退到本地：{ex.Message}");
-                return fallback;
-            }
-        }
+        if (!cloudService.IsEnabled)
+            throw new InvalidOperationException("课程表 API 地址无效，无法识别图片。");
 
-        var local = await offlineRecognizer.RecognizeAsync(document, cancellationToken);
-        local.RecognitionSource = "本地识别";
-        return local;
+        var response = await cloudService.RecognizeAsync(imagePath, document, cancellationToken);
+        var result = BuildCloudResult(document, response);
+        result.RecognitionSource = $"DeepSeek API（{response.Model}，{response.ElapsedMs / 1000d:F1} 秒）";
+        return result;
     }
 
     private ScheduleImageParseResult BuildCloudResult(OcrDocument document, CloudScheduleAiResponse response)
@@ -114,7 +99,7 @@ public sealed class ScheduleRecognitionCoordinator(
             StartTime = start.ToString("hh.mmtt", CultureInfo.InvariantCulture).ToLowerInvariant(),
             EndTime = end.ToString("hh.mmtt", CultureInfo.InvariantCulture).ToLowerInvariant(),
             Confidence = 0.84,
-            SourceText = $"云端 AI + 本地 OCR：{name} {item.Teacher} {item.Location}".Trim()
+            SourceText = $"DeepSeek API + 设备 OCR 校验：{name} {item.Teacher} {item.Location}".Trim()
         };
         return true;
     }

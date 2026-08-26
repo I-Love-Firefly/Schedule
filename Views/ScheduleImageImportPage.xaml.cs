@@ -8,67 +8,28 @@ namespace Schedule2._0.Views;
 public partial class ScheduleImageImportPage : ContentPage
 {
     private readonly IOcrService _ocrService;
-    private readonly IScheduleAiService _aiService;
     private readonly ScheduleRecognitionCoordinator _recognizer;
     private readonly DatabaseService _database;
-    private readonly ConfigService _configService;
     private readonly ObservableCollection<RecognizedCourse> _courses = [];
     private bool _writeAllowed;
 
     public ScheduleImageImportPage(
         IOcrService ocrService,
-        IScheduleAiService aiService,
         ScheduleRecognitionCoordinator recognizer,
-        DatabaseService database,
-        ConfigService configService)
+        DatabaseService database)
     {
         InitializeComponent();
         _ocrService = ocrService;
-        _aiService = aiService;
         _recognizer = recognizer;
         _database = database;
-        _configService = configService;
         CoursesView.ItemsSource = _courses;
-        CloudRecognitionSwitch.IsToggled = _configService.CloudRecognitionEnabled;
-        UpdateModelStatus();
-    }
-
-    private async void OnInstallModelClicked(object sender, EventArgs e)
-    {
-        if (!_aiService.IsSupported)
-        {
-            await DisplayAlertAsync("设备不支持", "本地课程表 AI 目前需要 arm64 Android 设备。", "确定");
-            return;
-        }
-        var file = await FilePicker.Default.PickAsync(new PickOptions
-        {
-            PickerTitle = $"选择 {_aiService.ModelFileName}",
-            FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-            {
-                [DevicePlatform.Android] = ["application/octet-stream", "application/gguf", "*/*"]
-            })
-        });
-        if (file is null) return;
-        SetBusy(true, "正在复制本地模型，完成后无需网络……");
-        try
-        {
-            await using var stream = await file.OpenReadAsync();
-            await _aiService.InstallModelAsync(stream);
-            UpdateModelStatus();
-            await DisplayAlertAsync("模型已安装", "后续课程表识别可完全离线运行。", "确定");
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlertAsync("安装失败", ex.Message, "确定");
-        }
-        finally { SetBusy(false); }
     }
 
     private async void OnPickImageClicked(object sender, EventArgs e)
     {
         if (!_ocrService.IsSupported)
         {
-            await DisplayAlertAsync("暂不支持", "离线截图识别第一版目前仅支持 Android。", "确定");
+            await DisplayAlertAsync("暂不支持", "课程表截图识别目前仅支持 Android。", "确定");
             return;
         }
 
@@ -79,9 +40,7 @@ public partial class ScheduleImageImportPage : ContentPage
         });
         if (file is null) return;
 
-        SetBusy(true, _configService.CloudRecognitionEnabled
-            ? "正在使用云端 DeepSeek 识别；失败时会自动回退到本地……"
-            : "正在本机识别图片，无需网络……");
+        SetBusy(true, "正在通过 DeepSeek API 识别课程表……");
         var cachePath = Path.Combine(FileSystem.CacheDirectory, $"schedule-ocr-{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}");
         try
         {
@@ -111,8 +70,8 @@ public partial class ScheduleImageImportPage : ContentPage
             _writeAllowed = false;
             SaveButton.IsEnabled = false;
             ReviewConfirmation.IsVisible = false;
-            StatusLabel.Text = "识别失败。";
-            await DisplayAlertAsync("识别失败", ex.Message, "确定");
+            StatusLabel.Text = "API 识别失败，未写入任何课程。";
+            await DisplayAlertAsync("API 识别失败", $"请检查网络或稍后重试。\n{ex.Message}", "确定");
         }
         finally
         {
@@ -164,14 +123,6 @@ public partial class ScheduleImageImportPage : ContentPage
         StatusLabel.Text = $"当前保留 {_courses.Count} 门课程，请校对后写入。";
     }
 
-    private void OnCloudRecognitionToggled(object sender, ToggledEventArgs e)
-    {
-        _configService.CloudRecognitionEnabled = e.Value;
-        CloudModeLabel.Text = e.Value
-            ? "云端优先：图片将发送到自有服务器，由 DeepSeek 识别；失败自动离线回退。"
-            : "完全离线：仅使用手机 OCR、几何解析和已安装的本地模型。";
-    }
-
     private void OnReviewConfirmedChanged(object sender, CheckedChangedEventArgs e) => UpdateSaveButton();
 
     private void UpdateSaveButton() =>
@@ -214,18 +165,9 @@ public partial class ScheduleImageImportPage : ContentPage
         BusyIndicator.IsVisible = busy;
         BusyIndicator.IsRunning = busy;
         PickImageButton.IsEnabled = !busy;
-        InstallModelButton.IsEnabled = !busy;
-        CloudRecognitionSwitch.IsEnabled = !busy;
         ReviewCheckBox.IsEnabled = !busy;
         SaveButton.IsEnabled = !busy && _courses.Count > 0 && (_writeAllowed || ReviewCheckBox.IsChecked);
         if (message is not null) StatusLabel.Text = message;
     }
 
-    private void UpdateModelStatus()
-    {
-        ModelStatusLabel.Text = _aiService.IsModelInstalled
-            ? "本地 AI 模型：已安装"
-            : "本地 AI 模型：未安装（仍可使用几何识别）";
-        InstallModelButton.Text = _aiService.IsModelInstalled ? "更换模型" : "安装本地模型";
-    }
 }

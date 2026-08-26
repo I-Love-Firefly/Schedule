@@ -6,7 +6,7 @@ namespace Schedule2._0.Tests;
 public sealed class ScheduleRecognitionCoordinatorTests
 {
     [Fact]
-    public async Task UsesCloudResultBeforeOfflineRecognizer()
+    public async Task UsesApiResult()
     {
         var document = BasicDocument();
         const string output = "{\"schemaVersion\":1,\"documentType\":\"weekly_schedule\",\"courses\":[" +
@@ -15,31 +15,26 @@ public sealed class ScheduleRecognitionCoordinatorTests
         var parser = new ScheduleImageParser();
         var coordinator = new ScheduleRecognitionCoordinator(
             parser,
-            new HybridScheduleRecognizer(parser, new UnsupportedScheduleAiService()),
             new FakeCloudService(output));
 
         var result = await coordinator.RecognizeAsync("unused.png", document, TestContext.Current.CancellationToken);
 
         Assert.Equal("高等数学", Assert.Single(result.Courses).Name);
         Assert.Contains("DeepSeek", result.RecognitionSource);
-        Assert.DoesNotContain(result.Warnings, x => x.Contains("回退", StringComparison.Ordinal));
+        Assert.DoesNotContain(result.Warnings, x => x.Contains("本地识别", StringComparison.Ordinal));
     }
 
     [Fact]
-    public async Task FallsBackToOfflineWhenCloudFails()
+    public async Task PropagatesApiFailureWithoutLocalFallback()
     {
         var document = BasicDocument();
         var parser = new ScheduleImageParser();
         var coordinator = new ScheduleRecognitionCoordinator(
             parser,
-            new HybridScheduleRecognizer(parser, new UnsupportedScheduleAiService()),
             new ThrowingCloudService());
 
-        var result = await coordinator.RecognizeAsync("unused.png", document, TestContext.Current.CancellationToken);
-
-        Assert.Contains("云端失败后回退", result.RecognitionSource);
-        Assert.Contains(result.Warnings, x => x.Contains("自动回退", StringComparison.Ordinal));
-        Assert.Single(result.Courses);
+        await Assert.ThrowsAsync<HttpRequestException>(() =>
+            coordinator.RecognizeAsync("unused.png", document, TestContext.Current.CancellationToken));
     }
 
     private static OcrDocument BasicDocument() => new()

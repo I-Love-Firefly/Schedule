@@ -7,23 +7,8 @@
     <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
         <VerticalStackLayout Grid.Row="0" Spacing="8">
             <Label Text="智能截图识别" FontSize="24" FontAttributes="Bold" TextColor="{DynamicResource TextMain}" />
-            <Label Text="默认优先使用服务器端 DeepSeek；断网、超时或服务异常时自动使用原有离线识别。"
+            <Label Text="识别需要网络：完整图片和设备 OCR 坐标将通过 HTTPS 发送到自有服务器，再由 DeepSeek API 结构化。"
                    FontSize="13" TextColor="{DynamicResource TextSec}" />
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                <Label x:Name="CloudModeLabel"
-                       Text="云端优先：图片将发送到自有服务器，由 DeepSeek 识别；失败自动离线回退。"
-                       FontSize="12" LineBreakMode="WordWrap" VerticalTextAlignment="Center"
-                       TextColor="{DynamicResource TextSec}" />
-                <Switch Grid.Column="1" x:Name="CloudRecognitionSwitch" IsToggled="True"
-                        Toggled="OnCloudRecognitionToggled" />
-            </Grid>
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                <Label x:Name="ModelStatusLabel" VerticalTextAlignment="Center" FontSize="12"
-                       TextColor="{DynamicResource TextSec}" />
-                <Button Grid.Column="1" x:Name="InstallModelButton" Text="安装本地模型"
-                        Clicked="OnInstallModelClicked" FontSize="12" HeightRequest="38"
-                        BackgroundColor="{DynamicResource BtnBgSec}" TextColor="{DynamicResource TextMain}" />
-            </Grid>
             <Button x:Name="PickImageButton" Text="选择课程表截图" Clicked="OnPickImageClicked"
                     BackgroundColor="{DynamicResource BtnBgMain}" TextColor="{DynamicResource TextMain}" />
             <ActivityIndicator x:Name="BusyIndicator" IsVisible="False" IsRunning="False" />

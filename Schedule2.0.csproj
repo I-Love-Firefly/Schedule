@@ -55,9 +55,8 @@
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<!-- Bundled Chinese/Latin OCR model: recognition works without a network connection. -->
+		<!-- Device OCR supplies text and geometry evidence to the API and validates its result. -->
 		<PackageReference Include="Xamarin.Google.MLKit.TextRecognition.Chinese" Version="116.0.0.9" />
-		<AndroidNativeLibrary Include="Platforms\Android\jniLibs\**\*.so" />
 	</ItemGroup>
 
 	<ItemGroup>

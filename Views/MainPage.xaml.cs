@@ -347,7 +347,7 @@ public partial class MainPage : ContentPage
             await HamburgerMenu.HideAsync();
         }
 
-        var options = new[] { "从课程表截图导入（离线）", "手动导入" };
+        var options = new[] { "从课程表截图导入（API识别）", "手动导入" };
         var idx = await PopupWindow.ShowAsync(
             host: ActionMenu,                              // MenuView 实例 - 用于承载弹窗的容器
             title: "",                                     // 弹窗标题 - 显示在顶部的文字（空字符串表示不显示标题）

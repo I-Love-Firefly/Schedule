@@ -6,7 +6,7 @@ namespace Schedule2._0.Services
         private const string ThemeKey = "user_theme_preference";
         private const string ThemeTagKey = "user_theme_tag_preference"; // 新增：标签存储键
         private const string LastUpdateKey = "last_sync_time";
-        private const string PrivacyAcceptedKey = "privacy_policy_accepted";
+        private const string PrivacyAcceptedKey = "privacy_policy_accepted_v2_api";
         private const string CardOpacityKey = "card_opacity";
         private const string BgImagePathKey = "background_image_path";
         private const string BgImageScaleKey = "background_image_scale";
@@ -14,7 +14,6 @@ namespace Schedule2._0.Services
         private const string BgImageOffsetYKey = "background_image_offset_y";
         private const string WidgetBgColorKey = "widget_bg_color";
         private const string WidgetBgOpacityKey = "widget_bg_opacity";
-        private const string CloudRecognitionEnabledKey = "cloud_schedule_recognition_enabled";
         private const string CloudRecognitionEndpointKey = "cloud_schedule_recognition_endpoint";
         private const string DefaultCloudRecognitionEndpoint = "https://justindividual.site/schedule-ai";
 
@@ -112,15 +111,6 @@ namespace Schedule2._0.Services
         {
             get => Preferences.Default.Get(WidgetBgOpacityKey, 1.0);
             set => Preferences.Default.Set(WidgetBgOpacityKey, value);
-        }
-
-        /// <summary>
-        /// 优先使用云端多模态模型；请求失败时仍会自动回退到本地识别。
-        /// </summary>
-        public bool CloudRecognitionEnabled
-        {
-            get => Preferences.Default.Get(CloudRecognitionEnabledKey, true);
-            set => Preferences.Default.Set(CloudRecognitionEnabledKey, value);
         }
 
         public string CloudRecognitionEndpoint

@@ -15,9 +15,8 @@
     <Compile Include="..\Services\ImageImport\OcrModels.cs" Link="OcrModels.cs" />
     <Compile Include="..\Services\ImageImport\RecognizedCourse.cs" Link="RecognizedCourse.cs" />
     <Compile Include="..\Services\ImageImport\ScheduleImageParser.cs" Link="ScheduleImageParser.cs" />
-    <Compile Include="..\Services\ImageImport\ScheduleAiModels.cs" Link="ScheduleAiModels.cs" />
+    <Compile Include="..\Services\ImageImport\ScheduleApiModels.cs" Link="ScheduleApiModels.cs" />
     <Compile Include="..\Services\ImageImport\CloudScheduleAiModels.cs" Link="CloudScheduleAiModels.cs" />
-    <Compile Include="..\Services\ImageImport\HybridScheduleRecognizer.cs" Link="HybridScheduleRecognizer.cs" />
     <Compile Include="..\Services\ImageImport\ScheduleRecognitionCoordinator.cs" Link="ScheduleRecognitionCoordinator.cs" />
     <Compile Include="..\Models\Course.cs" Link="Course.cs" />
   </ItemGroup>

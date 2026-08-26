@@ -33,5 +33,5 @@ public sealed class UnsupportedOcrService : IOcrService
     public bool IsSupported => false;
 
     public Task<OcrDocument> RecognizeAsync(string imagePath, CancellationToken cancellationToken = default) =>
-        throw new PlatformNotSupportedException("离线课程表识别第一版目前仅支持 Android。");
+        throw new PlatformNotSupportedException("课程表截图识别目前仅支持 Android。");
 }

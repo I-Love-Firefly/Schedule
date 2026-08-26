@@ -9,7 +9,6 @@ public sealed class CloudScheduleAiService(ConfigService configService, HttpClie
     private const int MaximumImageBytes = 10 * 1024 * 1024;
 
     public bool IsEnabled =>
-        configService.CloudRecognitionEnabled &&
         Uri.TryCreate(configService.CloudRecognitionEndpoint, UriKind.Absolute, out var uri) &&
         uri.Scheme == Uri.UriSchemeHttps;
 
@@ -18,7 +17,7 @@ public sealed class CloudScheduleAiService(ConfigService configService, HttpClie
         OcrDocument document,
         CancellationToken cancellationToken = default)
     {
-        if (!IsEnabled) throw new InvalidOperationException("云端课程表识别未启用或服务地址无效。");
+        if (!IsEnabled) throw new InvalidOperationException("课程表 API 服务地址无效。");
 
         var image = await File.ReadAllBytesAsync(imagePath, cancellationToken);
         if (image.Length == 0 || image.Length > MaximumImageBytes)

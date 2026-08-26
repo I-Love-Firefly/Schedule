@@ -19,6 +19,8 @@ namespace Schedule2._0
             _themeService = themeService;
             _configService = configService;
 
+            RemoveObsoleteLocalScheduleModel();
+
             ApplySystemTheme(_configService.AppTheme);
 
             MainPage = shell;
@@ -35,6 +37,27 @@ namespace Schedule2._0
                     });
                 }
             };
+        }
+
+        private static void RemoveObsoleteLocalScheduleModel()
+        {
+            var modelDirectory = Path.Combine(FileSystem.AppDataDirectory, "models");
+            var modelPath = Path.Combine(modelDirectory, "MiniCPM5-1B-Schedule-Q4_K_M.gguf");
+            try
+            {
+                if (File.Exists(modelPath)) File.Delete(modelPath);
+                if (File.Exists(modelPath + ".partial")) File.Delete(modelPath + ".partial");
+                if (Directory.Exists(modelDirectory) && !Directory.EnumerateFileSystemEntries(modelDirectory).Any())
+                    Directory.Delete(modelDirectory);
+            }
+            catch (IOException)
+            {
+                // Cleanup is best effort and must never block application startup.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // The obsolete model remains unused even when the OS refuses deletion.
+            }
         }
 
         protected override void OnStart()
@@ -68,4 +91,4 @@ namespace Schedule2._0
             }
         }
     }
-}   
+}
