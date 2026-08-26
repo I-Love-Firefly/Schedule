@@ -3,14 +3,15 @@ import assert from "node:assert/strict";
 import http from "node:http";
 import { spawn } from "node:child_process";
 
-test("gateway keeps provider key server-side and returns DeepSeek JSON", async () => {
+test("gateway keeps official DeepSeek key server-side and returns validated JSON", async () => {
   const upstream = http.createServer(async (request, response) => {
     assert.equal(request.headers.authorization, "Bearer test-secret-key");
     const chunks = [];
     for await (const chunk of request) chunks.push(chunk);
     const body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-    assert.equal(body.model, "deepseek/deepseek-v4-flash-vision-exp");
+    assert.equal(body.model, "deepseek-v4-flash-vision-exp");
     assert.equal(body.messages[1].content[1].type, "image_url");
+    assert.equal(body.messages[1].content[1].image_url.detail, "original");
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSON.stringify({
       choices: [{ message: { content: "{\"schemaVersion\":1,\"documentType\":\"weekly_schedule\",\"courses\":[]}" } }]
@@ -23,8 +24,8 @@ test("gateway keeps provider key server-side and returns DeepSeek JSON", async (
     env: {
       ...process.env,
       PORT: "18082",
-      TOKENHUB_API_KEY: "test-secret-key",
-      TOKENHUB_URL: "http://127.0.0.1:18081/v1/chat/completions"
+      DEEPSEEK_API_KEY: "test-secret-key",
+      DEEPSEEK_API_URL: "http://127.0.0.1:18081/chat/completions"
     },
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -36,14 +37,14 @@ test("gateway keeps provider key server-side and returns DeepSeek JSON", async (
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         mimeType: "image/png",
-        imageBase64: Buffer.from("fake-image-contents").toString("base64"),
+        imageBase64: Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0]).toString("base64"),
         ocrLayout: "OCR_BLOCKS:\n[0,0,1,1] 高等数学"
       })
     });
     assert.equal(response.status, 200);
     const body = await response.json();
-    assert.equal(body.provider, "Tencent Cloud TokenHub");
-    assert.equal(body.model, "deepseek/deepseek-v4-flash-vision-exp");
+    assert.equal(body.provider, "DeepSeek 官方 API");
+    assert.equal(body.model, "deepseek-v4-flash-vision-exp");
     assert.match(body.content, /weekly_schedule/);
   } finally {
     gateway.kill();

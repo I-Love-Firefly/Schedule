@@ -28,9 +28,10 @@ public sealed class CloudScheduleAiService(ConfigService configService, HttpClie
         var mimeType = extension switch
         {
             ".jpg" or ".jpeg" => "image/jpeg",
+            ".gif" => "image/gif",
             ".webp" => "image/webp",
-            ".bmp" => "image/bmp",
-            _ => "image/png"
+            ".png" => "image/png",
+            _ => throw new InvalidDataException("云端 DeepSeek 仅支持 JPEG、PNG、GIF 或 WebP 图片。")
         };
         var request = new
         {

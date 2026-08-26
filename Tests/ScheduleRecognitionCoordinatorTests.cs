@@ -61,7 +61,7 @@ public sealed class ScheduleRecognitionCoordinatorTests
         public bool IsEnabled => true;
         public Task<CloudScheduleAiResponse> RecognizeAsync(string imagePath, OcrDocument document,
             CancellationToken cancellationToken = default) =>
-            Task.FromResult(new CloudScheduleAiResponse(output, "Tencent Cloud TokenHub", "DeepSeek test", 1234, "test"));
+            Task.FromResult(new CloudScheduleAiResponse(output, "DeepSeek 官方 API", "DeepSeek test", 1234, "test"));
     }
 
     private sealed class ThrowingCloudService : ICloudScheduleAiService
