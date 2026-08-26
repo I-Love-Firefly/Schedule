@@ -16,7 +16,7 @@ namespace Schedule2._0.Services
         private const string WidgetBgOpacityKey = "widget_bg_opacity";
         private const string CloudRecognitionEnabledKey = "cloud_schedule_recognition_enabled";
         private const string CloudRecognitionEndpointKey = "cloud_schedule_recognition_endpoint";
-        private const string DefaultCloudRecognitionEndpoint = "https://schedule-ai.42-193-179-91.sslip.io";
+        private const string DefaultCloudRecognitionEndpoint = "https://justindividual.site/schedule-ai";
 
 
         /// <summary>

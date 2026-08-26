@@ -3,6 +3,8 @@ services:
     build: .
     restart: unless-stopped
     env_file: .env
+    ports:
+      - "127.0.0.1:18080:8080"
     networks: [internal]
     security_opt:
       - no-new-privileges:true
@@ -14,6 +16,7 @@ services:
 
   caddy:
     image: caddy:2.10-alpine
+    profiles: ["caddy"]
     restart: unless-stopped
     environment:
       SCHEDULE_AI_HOST: ${SCHEDULE_AI_HOST}
