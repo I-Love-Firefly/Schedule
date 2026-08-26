@@ -20,6 +20,7 @@ public partial class MainPage : ContentPage
     private readonly ConfigService _configService;
     private double _backgroundImageWidth;
     private double _backgroundImageHeight;
+    private bool _startupDialogsRunning;
 
     public MainPage(DatabaseService dbService, ViewModels.MainViewModel viewModel, ConfigService configService)
     {
@@ -45,9 +46,25 @@ public partial class MainPage : ContentPage
         Schedule2._0.Services.WidgetHelper.ForceRefreshWidget();
 #endif
 
-        if (!_configService.PrivacyPolicyAccepted)
+        if (!_startupDialogsRunning)
         {
-            await ShowPrivacyPolicyAsync();
+            _startupDialogsRunning = true;
+            try
+            {
+                if (!_configService.PrivacyPolicyAccepted)
+                {
+                    await ShowPrivacyPolicyAsync();
+                }
+
+                if (_configService.PrivacyPolicyAccepted && _configService.ShouldShowVersion21UpdateNotes)
+                {
+                    await ShowVersion21UpdateNotesAsync();
+                }
+            }
+            finally
+            {
+                _startupDialogsRunning = false;
+            }
         }
 
         _viewModel.CardOpacity = _configService.CardOpacity;
@@ -55,6 +72,16 @@ public partial class MainPage : ContentPage
         LoadBackgroundImage();
 
         await LoadCourses();
+    }
+
+    private async Task ShowVersion21UpdateNotesAsync()
+    {
+        using var stream = await FileSystem.OpenAppPackageFileAsync("UpdateNotes_2_1.txt");
+        using var reader = new StreamReader(stream);
+        var updateNotes = await reader.ReadToEndAsync();
+
+        await DisplayAlertAsync("课表助手 2.1 更新", updateNotes, "知道了");
+        _configService.Version21UpdateNotesSeen = true;
     }
 
     private void LoadBackgroundImage()

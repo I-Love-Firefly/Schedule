@@ -1,3 +1,5 @@
+using Schedule2._0.Helpers;
+
 namespace Schedule2._0.Services
 {
     public class ConfigService
@@ -6,7 +8,9 @@ namespace Schedule2._0.Services
         private const string ThemeKey = "user_theme_preference";
         private const string ThemeTagKey = "user_theme_tag_preference"; // 新增：标签存储键
         private const string LastUpdateKey = "last_sync_time";
+        private const string LegacyPrivacyAcceptedKey = "privacy_policy_accepted";
         private const string PrivacyAcceptedKey = "privacy_policy_accepted_v2_api";
+        private const string Version21UpdateNotesSeenKey = "update_notes_seen_2_1";
         private const string CardOpacityKey = "card_opacity";
         private const string BgImagePathKey = "background_image_path";
         private const string BgImageScaleKey = "background_image_scale";
@@ -45,6 +49,20 @@ namespace Schedule2._0.Services
             get => Preferences.Default.Get(PrivacyAcceptedKey, false);
             set => Preferences.Default.Set(PrivacyAcceptedKey, value);
         }
+
+        /// <summary>
+        /// 2.0 用户同意隐私政策后会留下旧键；全新安装的 2.1 不会有该记录。
+        /// </summary>
+        public bool WasVersion20User => Preferences.Default.Get(LegacyPrivacyAcceptedKey, false);
+
+        public bool Version21UpdateNotesSeen
+        {
+            get => Preferences.Default.Get(Version21UpdateNotesSeenKey, false);
+            set => Preferences.Default.Set(Version21UpdateNotesSeenKey, value);
+        }
+
+        public bool ShouldShowVersion21UpdateNotes =>
+            UpdateNoticePolicy.ShouldShow(WasVersion20User, Version21UpdateNotesSeen);
 
         /// <summary>
         /// 课程卡片透明度：0.0（完全透明）到 1.0（完全不透明）

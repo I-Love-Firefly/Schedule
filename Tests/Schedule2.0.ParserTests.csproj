@@ -18,6 +18,7 @@
     <Compile Include="..\Services\ImageImport\ScheduleApiModels.cs" Link="ScheduleApiModels.cs" />
     <Compile Include="..\Services\ImageImport\CloudScheduleAiModels.cs" Link="CloudScheduleAiModels.cs" />
     <Compile Include="..\Services\ImageImport\ScheduleRecognitionCoordinator.cs" Link="ScheduleRecognitionCoordinator.cs" />
+    <Compile Include="..\Helpers\UpdateNoticePolicy.cs" Link="UpdateNoticePolicy.cs" />
     <Compile Include="..\Models\Course.cs" Link="Course.cs" />
   </ItemGroup>
 </Project>
